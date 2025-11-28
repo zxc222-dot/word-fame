@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词黄金矿工 - 最终完善版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(to bottom, #8B4513, #5D4037);
+            color: #FFF;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            border: 3px solid #D2691E;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            text-shadow: 3px 3px 0 #000;
+            margin-bottom: 8px;
+            color: #FFD700;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #FFA500;
+            margin-bottom: 10px;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .game-area {
+            flex: 1;
+            min-width: 600px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border: 5px solid #8B4513;
+        }
+        
+        .control-panel {
+            flex: 0 0 250px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border: 5px solid #8B4513;
+        }
+        
+        canvas {
+            background: #5d4037;
+            border-radius: 10px;
+            width: 100%;
+            height: 500px;
+            display: block;
+            border: 2px solid #3E2723;
+        }
+        
+        .hint-area {
+            background: #8d6e63;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #5D4037;
+            color: #FFD700;
+            text-shadow: 1px 1px 2px #000;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            background: rgba(139, 69, 19, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .stat {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid #FFD700;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        button {
+            background: linear-gradient(to bottom, #ffd700, #ff9800);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: #5d4037;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.3s;
+            font-size: 1rem;
+            box-shadow: 0 4px 0 #b28704;
+            border: 2px solid #8B4513;
+        }
+        
+        button:hover {
+            background: linear-gradient(to bottom, #ffed4e, #ffb347);
+        }
+        
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #b28704;
+        }
+        
+        .word-input {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #8B4513;
+        }
+        
+        h2 {
+            color: #ffd700;
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+            text-shadow: 1px 1px 2px #000;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 0.9rem;
+            resize: vertical;
+            margin-bottom: 8px;
+            border: 1px solid #8B4513;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            border: 2px solid #8B4513;
+        }
+        
+        .instructions ul {
+            margin-left: 18px;
+            margin-top: 8px;
+        }
+        
+        .instructions li {
+            margin-bottom: 4px;
+        }
+        
+        .highlight {
+            color: #ffd700;
+            font-weight: bold;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 15px;
+        }
+        
+        .game-over h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #FFD700;
+        }
+        
+        .game-over p {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #FFF;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .word-list {
+            max-height: 120px;
+            overflow-y: auto;
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            border: 1px solid #8B4513;
+        }
+        
+        .word-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+        
+        .footer {
+            margin-top: 15px;
+            text-align: center;
+            color: #ffd700;
+            font-size: 0.8rem;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 900px) {
+            .game-container {
+                flex-direction: column;
+            }
+            
+            .game-area, .control-panel {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>单词黄金矿工</h1>
+            <p class="subtitle">最终完善版 - 180度摆动范围，单词尺寸增大，可临时跳过单词</p>
+        </header>
+        
+        <div class="game-container">
+            <div class="game-area">
+                <div class="hint-area" id="hint">准备开始游戏！</div>
+                <div class="stats">
+                    <div class="stat">关卡: <span id="level">1</span></div>
+                    <div class="stat">分数: <span id="score">0</span></div>
+                    <div class="stat">机会: <span id="chances">1</span></div>
+                    <div class="stat">单词: <span id="word-count">0/0</span></div>
+                </div>
+                <canvas id="gameCanvas" width="800" height="500"></canvas>
+                <div class="controls">
+                    <button id="startBtn">开始游戏</button>
+                    <button id="resetBtn" type="button">重新开始</button>
+                    <button id="hintBtn">切换提示</button>
+                    <button id="skipWordBtn">临时跳过</button>
+                </div>
+                
+                <div id="gameOver" class="game-over hidden">
+                    <h2>游戏结束</h2>
+                    <p>你的得分: <span id="finalScore">0</span></p>
+                    <p>通过的关卡: <span id="finalLevel">1</span></p>
+                    <button id="restartBtn" type="button">再玩一次</button>
+                </div>
+            </div>
+            
+            <div class="control-panel">
+                <div class="word-input">
+                    <h2>导入单词</h2>
+                    <textarea id="wordInput" placeholder="输入单词，格式：英文,中文
+例如：
+apple,苹果
+banana,香蕉
+computer,电脑"></textarea>
+                    <button id="importBtn" type="button">导入单词</button>
+                    <p class="example">提示：每行一个单词，英文和中文用逗号分隔</p>
+                    
+                    <div class="word-list" id="wordList">
+                        <p>暂无单词，请先导入单词</p>
+                    </div>
+                </div>
+                
+                <div class="instructions">
+                    <h2>游戏说明</h2>
+                    <p>根据提示抓取正确的单词矿石：</p>
+                    <ul>
+                        <li><span class="highlight">金矿</span> - 10分</li>
+                        <li><span class="highlight">银矿</span> - 5分</li>
+                        <li><span class="highlight">石头</span> - 0分</li>
+                    </ul>
+                    <p>操作方式：</p>
+                    <ul>
+                        <li>点击<span class="highlight">空格键</span>或<span class="highlight">鼠标点击</span>发射钩子</li>
+                        <li>抓取与提示匹配的单词矿石</li>
+                        <li>错误抓取会损失机会</li>
+                        <li>大矿石收回慢，小矿石收回快</li>
+                    </ul>
+                    <p>最终完善说明：</p>
+                    <ul>
+                        <li>钩子摆动范围扩大至180度</li>
+                        <li>单词矿石尺寸增大，更易看清</li>
+                        <li>添加"临时跳过"按钮，可跳过被遮挡的单词</li>
+                        <li>跳过的单词在抓到下一个单词后会自动恢复</li>
+                        <li>机会只有1次，请谨慎操作</li>
+                        <li>单词计数只显示已成功抓取的单词数量</li>
+                        <li>确保所有单词都在180度范围内</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>单词黄金矿工 - 最终完善版 | 专为英语学习设计</p>
+        </div>
+    </div>
+
+    <script>
+        // 游戏变量
+        let gameState = {
+            isRunning: false,
+            score: 0,
+            level: 1,
+            chances: 1, // 修改为1次机会
+            currentWords: [],
+            skippedWord: null, // 只记录当前跳过的单词，而不是数组
+            currentHint: '',
+            hintType: 'chinese',
+            wordIndex: 0,
+            capturedCount: 0, // 新增：记录已成功抓取的单词数量
+            totalWords: 0
+        };
+
+        // 默认单词库
+        let wordDatabase = [
+            { english: "apple", chinese: "苹果", pronunciation: "/ˈæpl/", difficulty: "gold" },
+            { english: "banana", chinese: "香蕉", pronunciation: "/bəˈnɑːnə/", difficulty: "silver" },
+            { english: "computer", chinese: "电脑", pronunciation: "/kəmˈpjuːtər/", difficulty: "gold" },
+            { english: "book", chinese: "书", pronunciation: "/bʊk/", difficulty: "silver" },
+            { english: "water", chinese: "水", pronunciation: "/ˈwɔːtər/", difficulty: "silver" },
+            { english: "friend", chinese: "朋友", pronunciation: "/frend/", difficulty: "gold" },
+            { english: "school", chinese: "学校", pronunciation: "/skuːl/", difficulty: "silver" },
+            { english: "music", chinese: "音乐", pronunciation: "/ˈmjuːzɪk/", difficulty: "silver" }
+        ];
+
+        // 画布和上下文
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // 矿工和钩子变量 - 最终优化参数
+        let miner = {
+            x: canvas.width / 2,
+            y: 60,
+            width: 50,
+            height: 70,
+            hatOffset: 0,
+            armAngle: 0,
+            isThrowing: false
+        };
+
+        let hook = {
+            x: miner.x,
+            y: miner.y + miner.height - 10,
+            length: 50,
+            angle: Math.PI/2,
+            speed: 0.0075,
+            isExtending: false,
+            isRetracting: false,
+            hasItem: false,
+            caughtItem: null,
+            extendSpeed: 3,
+            retractSpeed: 1.5
+        };
+
+        // 矿石数组
+        let ores = [];
+
+        // 初始化游戏
+        function initGame() {
+            gameState.isRunning = true;
+            gameState.score = 0;
+            gameState.level = 1;
+            gameState.chances = 1; // 修改为1次机会
+            gameState.wordIndex = 0;
+            gameState.capturedCount = 0; // 重置已抓取单词计数
+            gameState.totalWords = wordDatabase.length;
+            gameState.skippedWord = null; // 重置跳过的单词
+            
+            // 重置钩子状态
+            hook.x = miner.x;
+            hook.y = miner.y + miner.height - 10;
+            hook.length = 50;
+            hook.angle = Math.PI/2;
+            hook.speed = 0.0075; // 确保每次重新开始都是相同的速度
+            hook.isExtending = false;
+            hook.isRetracting = false;
+            hook.hasItem = false;
+            hook.caughtItem = null;
+            
+            updateStats();
+            generateLevel();
+            
+            // 隐藏游戏结束画面
+            document.getElementById('gameOver').classList.add('hidden');
+            
+            // 开始游戏循环
+            gameLoop();
+        }
+
+        // 生成关卡 - 确保矿石在180度范围内且分布合理
+        function generateLevel() {
+            ores = [];
+            
+            // 清空当前单词
+            gameState.currentWords = [];
+            
+            // 根据关卡选择单词数量
+            let wordCount = Math.min(3 + gameState.level, wordDatabase.length);
+            
+            // 随机选择单词
+            let shuffled = [...wordDatabase].sort(() => 0.5 - Math.random());
+            gameState.currentWords = shuffled.slice(0, wordCount);
+            
+            // 生成矿石 - 确保在180度范围内
+            let positions = generate180DegreeOrePositions(wordCount + Math.min(2 + gameState.level, 5));
+            
+            // 生成单词矿石
+            for (let i = 0; i < gameState.currentWords.length; i++) {
+                let word = gameState.currentWords[i];
+                let position = positions[i];
+                
+                // 根据难度确定矿石类型
+                let type = word.difficulty === 'gold' ? 'gold' : 'silver';
+                
+                // 矿石尺寸 - 进一步增大
+                let size = Math.random() > 0.6 ? 'large' : (Math.random() > 0.5 ? 'medium' : 'small');
+                let radius = size === 'large' ? 45 : (size === 'medium' ? 35 : 25);
+                
+                ores.push({
+                    x: position.x,
+                    y: position.y,
+                    radius: radius,
+                    type: type,
+                    word: word,
+                    isCaught: false,
+                    size: size
+                });
+            }
+            
+            // 添加一些石头作为干扰项
+            let stoneCount = Math.min(2 + gameState.level, 5);
+            for (let i = 0; i < stoneCount; i++) {
+                let position = positions[gameState.currentWords.length + i];
+                
+                // 石头尺寸 - 进一步增大
+                let size = Math.random() > 0.6 ? 'large' : (Math.random() > 0.5 ? 'medium' : 'small');
+                let radius = size === 'large' ? 45 : (size === 'medium' ? 35 : 25);
+                
+                ores.push({
+                    x: position.x,
+                    y: position.y,
+                    radius: radius,
+                    type: 'stone',
+                    word: null,
+                    isCaught: false,
+                    size: size
+                });
+            }
+            
+            // 设置第一个单词的提示
+            setNextHint();
+        }
+
+        // 生成180度范围内的矿石位置
+        function generate180DegreeOrePositions(count) {
+            let positions = [];
+            
+            // 180度摆动范围
+            const minAngle = 0; // 0度
+            const maxAngle = Math.PI; // 180度
+            const maxHookLength = 350;
+            
+            // 计算可到达的区域
+            const minX = 50;
+            const maxX = canvas.width - 50;
+            const minY = 180;
+            const maxY = canvas.height - 50;
+            
+            // 使用更分散的布局
+            const gridCols = 6; // 增加列数
+            const gridRows = Math.ceil(count / gridCols);
+            const cellWidth = (maxX - minX) / gridCols;
+            const cellHeight = (maxY - minY) / gridRows;
+            
+            // 为每个矿石分配一个网格单元
+            for (let i = 0; i < count; i++) {
+                let row = Math.floor(i / gridCols);
+                let col = i % gridCols;
+                
+                // 在网格单元内随机位置生成矿石，但确保更分散
+                let x = minX + col * cellWidth + Math.random() * cellWidth * 0.5;
+                let y = minY + row * cellHeight + Math.random() * cellHeight * 0.5;
+                
+                // 确保矿石不会超出画布
+                if (x < 50) x = 50;
+                if (x > canvas.width - 50) x = canvas.width - 50;
+                if (y < 180) y = 180;
+                if (y > canvas.height - 50) y = canvas.height - 50;
+                
+                positions.push({
+                    x: x,
+                    y: y
+                });
+            }
+            
+            return positions;
+        }
+
+        // 设置下一个提示
+        function setNextHint() {
+            if (gameState.capturedCount < gameState.currentWords.length) {
+                let word = gameState.currentWords[gameState.wordIndex];
+                
+                switch(gameState.hintType) {
+                    case 'chinese':
+                        gameState.currentHint = `中文意思: ${word.chinese}`;
+                        break;
+                    case 'english':
+                        gameState.currentHint = `英文定义: ${word.english}`;
+                        break;
+                    case 'pronunciation':
+                        gameState.currentHint = `发音: ${word.pronunciation}`;
+                        break;
+                }
+                
+                document.getElementById('hint').textContent = gameState.currentHint;
+            } else {
+                // 关卡完成
+                levelComplete();
+            }
+        }
+
+        // 临时跳过当前单词
+        function skipWord() {
+            if (gameState.currentWords.length <= 1) return;
+            
+            // 将当前单词标记为已跳过
+            gameState.skippedWord = gameState.currentWords[gameState.wordIndex];
+            
+            // 移动到下一个单词，但不增加已抓取计数
+            gameState.wordIndex = (gameState.wordIndex + 1) % gameState.currentWords.length;
+            
+            setNextHint();
+            updateStats();
+        }
+
+        // 关卡完成
+        function levelComplete() {
+            gameState.level++;
+            gameState.wordIndex = 0;
+            gameState.capturedCount = 0; // 重置已抓取单词计数
+            gameState.skippedWord = null; // 重置跳过的单词
+            
+            if (gameState.level > 5) {
+                gameOver(true);
+            } else {
+                generateLevel();
+                updateStats();
+            }
+        }
+
+        // 游戏结束
+        function gameOver(isWin = false) {
+            gameState.isRunning = false;
+            
+            document.getElementById('finalScore').textContent = gameState.score;
+            document.getElementById('finalLevel').textContent = gameState.level - 1;
+            
+            let gameOverDiv = document.getElementById('gameOver');
+            gameOverDiv.classList.remove('hidden');
+            
+            if (isWin) {
+                gameOverDiv.querySelector('h2').textContent = "恭喜通关！";
+            } else {
+                gameOverDiv.querySelector('h2').textContent = "游戏结束";
+            }
+        }
+
+        // 更新统计信息
+        function updateStats() {
+            document.getElementById('level').textContent = gameState.level;
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('chances').textContent = gameState.chances;
+            // 修改：只显示已成功抓取的单词数量，而不是当前单词索引
+            document.getElementById('word-count').textContent = `${gameState.capturedCount}/${gameState.currentWords.length}`;
+        }
+
+        // 绘制游戏
+        function drawGame() {
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制背景
+            ctx.fillStyle = '#5d4037';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制矿井顶部
+            ctx.fillStyle = '#3E2723';
+            ctx.fillRect(0, 0, canvas.width, 50);
+            
+            // 绘制矿工
+            drawClassicMiner();
+            
+            // 绘制钩子摆动点
+            let pivotX = miner.x;
+            let pivotY = miner.y + miner.height - 10;
+            
+            // 绘制钩子线
+            ctx.beginPath();
+            ctx.moveTo(pivotX, pivotY);
+            ctx.lineTo(hook.x, hook.y);
+            ctx.strokeStyle = '#8d6e63';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // 绘制钩子
+            drawClassicHook();
+            
+            // 绘制矿石
+            ores.forEach(ore => {
+                if (!ore.isCaught) {
+                    drawClassicOre(ore);
+                }
+            });
+            
+            // 绘制被抓取的矿石
+            if (hook.hasItem && hook.caughtItem) {
+                let ore = hook.caughtItem;
+                // 临时改变位置为钩子位置
+                let originalX = ore.x;
+                let originalY = ore.y;
+                ore.x = hook.x;
+                ore.y = hook.y;
+                
+                drawClassicOre(ore);
+                
+                // 恢复原始位置
+                ore.x = originalX;
+                ore.y = originalY;
+            }
+        }
+
+        // 绘制经典矿工形象
+        function drawClassicMiner() {
+            // 矿工身体
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(miner.x - miner.width/2, miner.y, miner.width, miner.height);
+            
+            // 矿工头部
+            ctx.fillStyle = '#FFE0B2';
+            ctx.beginPath();
+            ctx.arc(miner.x, miner.y - 12, 18, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 矿工帽子
+            ctx.fillStyle = '#D32F2F';
+            ctx.beginPath();
+            ctx.ellipse(miner.x, miner.y - 25, 20, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 帽子顶部
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(miner.x, miner.y - 32, 6, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 矿工眼睛
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(miner.x - 5, miner.y - 15, 3, 0, Math.PI * 2);
+            ctx.arc(miner.x + 5, miner.y - 15, 3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 矿工嘴巴
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(miner.x, miner.y - 8, 6, 0.1 * Math.PI, 0.9 * Math.PI);
+            ctx.stroke();
+            
+            // 矿工胡子
+            ctx.fillStyle = '#8B4513';
+            ctx.beginPath();
+            ctx.ellipse(miner.x, miner.y - 4, 10, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 矿工手臂
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(miner.x - 5, miner.y + 15);
+            
+            if (hook.isExtending || hook.isRetracting) {
+                ctx.lineTo(miner.x - 20, miner.y + 8);
+            } else {
+                ctx.lineTo(miner.x - 12 - Math.cos(hook.angle) * 8, miner.y + 8 - Math.sin(hook.angle) * 4);
+            }
+            ctx.stroke();
+        }
+
+        // 绘制经典钩子
+        function drawClassicHook() {
+            // 钩子主体
+            ctx.fillStyle = '#9e9e9e';
+            ctx.beginPath();
+            ctx.arc(hook.x, hook.y, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 钩子尖端
+            ctx.beginPath();
+            ctx.moveTo(hook.x, hook.y);
+            ctx.lineTo(hook.x - 10, hook.y + 12);
+            ctx.lineTo(hook.x + 10, hook.y + 12);
+            ctx.closePath();
+            ctx.fill();
+            
+            // 钩子内部
+            ctx.fillStyle = '#757575';
+            ctx.beginPath();
+            ctx.arc(hook.x, hook.y, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 绘制经典矿石 - 增大尺寸
+        function drawClassicOre(ore) {
+            let gradient;
+            
+            switch(ore.type) {
+                case 'gold':
+                    // 金矿
+                    gradient = ctx.createRadialGradient(
+                        ore.x, ore.y, 0,
+                        ore.x, ore.y, ore.radius
+                    );
+                    gradient.addColorStop(0, '#FFD700');
+                    gradient.addColorStop(0.7, '#D4AF37');
+                    gradient.addColorStop(1, '#B8860B');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(ore.x, ore.y, ore.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // 添加高光
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    ctx.beginPath();
+                    ctx.arc(ore.x - ore.radius/3, ore.y - ore.radius/3, ore.radius/3, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                    
+                case 'silver':
+                    // 银矿
+                    gradient = ctx.createRadialGradient(
+                        ore.x, ore.y, 0,
+                        ore.x, ore.y, ore.radius
+                    );
+                    gradient.addColorStop(0, '#F8F8F8');
+                    gradient.addColorStop(0.7, '#C0C0C0');
+                    gradient.addColorStop(1, '#A0A0A0');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(ore.x, ore.y, ore.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // 添加金属光泽
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                    ctx.beginPath();
+                    ctx.arc(ore.x - ore.radius/3, ore.y - ore.radius/3, ore.radius/2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                    
+                case 'stone':
+                    // 石头
+                    ctx.fillStyle = '#696969';
+                    ctx.beginPath();
+                    ctx.arc(ore.x, ore.y, ore.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // 添加石头纹理
+                    ctx.fillStyle = '#808080';
+                    for (let i = 0; i < 4; i++) {
+                        let angle = Math.random() * Math.PI * 2;
+                        let distance = Math.random() * ore.radius * 0.6;
+                        let spotX = ore.x + distance * Math.cos(angle);
+                        let spotY = ore.y + distance * Math.sin(angle);
+                        let spotSize = Math.random() * ore.radius/4 + 2;
+                        
+                        ctx.beginPath();
+                        ctx.arc(spotX, spotY, spotSize, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    break;
+            }
+            
+            // 绘制单词（如果是单词矿石）- 增大字体
+            if (ore.word) {
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold ' + (ore.radius > 30 ? '16px' : '14px') + ' Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(ore.word.english, ore.x, ore.y);
+                
+                // 不再绘制叉标记
+            }
+        }
+
+        // 游戏主循环
+        function gameLoop() {
+            if (!gameState.isRunning) return;
+            
+            // 更新钩子位置
+            updateHook();
+            
+            // 绘制游戏
+            drawGame();
+            
+            // 继续循环
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 更新钩子位置 - 180度摆动范围
+        function updateHook() {
+            let pivotX = miner.x;
+            let pivotY = miner.y + miner.height - 10;
+            
+            if (!hook.isExtending && !hook.isRetracting) {
+                // 摆动模式 - 180度范围
+                hook.angle += hook.speed;
+                
+                // 限制摆动范围 - 180度
+                if (hook.angle < 0 || hook.angle > Math.PI) {
+                    hook.speed = -hook.speed;
+                }
+                
+                hook.x = pivotX + Math.cos(hook.angle) * hook.length;
+                hook.y = pivotY + Math.sin(hook.angle) * hook.length;
+            } else if (hook.isExtending) {
+                // 延伸模式
+                hook.length += hook.extendSpeed;
+                hook.x = pivotX + Math.cos(hook.angle) * hook.length;
+                hook.y = pivotY + Math.sin(hook.angle) * hook.length;
+                
+                // 检查是否抓到矿石
+                checkCollisions();
+                
+                // 检查是否到达边界
+                if (hook.x < 0 || hook.x > canvas.width || hook.y > canvas.height - 30) {
+                    hook.isExtending = false;
+                    hook.isRetracting = true;
+                }
+            } else if (hook.isRetracting) {
+                // 收回模式
+                let speed = hook.retractSpeed;
+                
+                // 如果有抓到的物品，根据大小调整速度
+                if (hook.hasItem && hook.caughtItem) {
+                    switch(hook.caughtItem.size) {
+                        case 'large':
+                            speed = hook.retractSpeed * 0.5;
+                            break;
+                        case 'medium':
+                            speed = hook.retractSpeed * 0.75;
+                            break;
+                        case 'small':
+                            speed = hook.retractSpeed;
+                            break;
+                    }
+                }
+                
+                hook.length -= speed;
+                hook.x = pivotX + Math.cos(hook.angle) * hook.length;
+                hook.y = pivotY + Math.sin(hook.angle) * hook.length;
+                
+                // 如果回到起点
+                if (hook.length <= 50) {
+                    hook.isRetracting = false;
+                    hook.length = 50;
+                    
+                    // 如果有抓到的物品，处理得分
+                    if (hook.hasItem) {
+                        processCaughtItem();
+                    }
+                }
+            }
+        }
+
+        // 检查碰撞
+        function checkCollisions() {
+            for (let i = 0; i < ores.length; i++) {
+                let ore = ores[i];
+                
+                if (!ore.isCaught) {
+                    let dx = hook.x - ore.x;
+                    let dy = hook.y - ore.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < ore.radius + 8) {
+                        // 抓到矿石
+                        ore.isCaught = true;
+                        hook.hasItem = true;
+                        hook.caughtItem = ore;
+                        hook.isExtending = false;
+                        hook.isRetracting = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 处理抓到的物品 - 修复单词比较问题
+        function processCaughtItem() {
+            let ore = hook.caughtItem;
+            
+            if (ore.word) {
+                // 检查是否是当前目标单词 - 修复比较逻辑
+                let currentTargetWord = gameState.currentWords[gameState.wordIndex];
+                if (ore.word.english === currentTargetWord.english) {
+                    // 正确抓取
+                    let points = ore.type === 'gold' ? 10 : 5;
+                    gameState.score += points;
+                    
+                    // 播放成功音效
+                    playSuccessSound();
+                    
+                    // 在抓到单词后恢复之前跳过的单词
+                    if (gameState.skippedWord) {
+                        // 恢复跳过的单词
+                        gameState.skippedWord = null;
+                    }
+                    
+                    // 增加已抓取单词计数
+                    gameState.capturedCount++;
+                    
+                    // 移动到下一个单词
+                    gameState.wordIndex = (gameState.wordIndex + 1) % gameState.currentWords.length;
+                    
+                    setNextHint();
+                } else {
+                    // 错误抓取
+                    gameState.chances--;
+                    if (gameState.chances <= 0) {
+                        gameOver(false);
+                    }
+                }
+            } else {
+                // 抓到石头
+                gameState.chances--;
+                if (gameState.chances <= 0) {
+                    gameOver(false);
+                }
+            }
+            
+            // 重置钩子状态
+            hook.hasItem = false;
+            hook.caughtItem = null;
+            
+            updateStats();
+        }
+
+        // 播放成功音效
+        function playSuccessSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
+                oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (e) {
+                console.log("音频播放失败:", e);
+            }
+        }
+
+        // 发射钩子
+        function fireHook() {
+            if (!gameState.isRunning) return;
+            
+            if (!hook.isExtending && !hook.isRetracting) {
+                hook.isExtending = true;
+            }
+        }
+
+        // 导入单词
+        function importWords() {
+            let input = document.getElementById('wordInput').value.trim();
+            if (!input) return;
+            
+            let lines = input.split('\n');
+            let newWords = [];
+            
+            lines.forEach(line => {
+                let parts = line.split(',');
+                if (parts.length >= 2) {
+                    let english = parts[0].trim();
+                    let chinese = parts[1].trim();
+                    let pronunciation = parts[2] ? parts[2].trim() : "/?/";
+                    let difficulty = Math.random() > 0.5 ? "gold" : "silver";
+                    
+                    newWords.push({
+                        english: english,
+                        chinese: chinese,
+                        pronunciation: pronunciation,
+                        difficulty: difficulty
+                    });
+                }
+            });
+            
+            if (newWords.length > 0) {
+                wordDatabase = newWords;
+                updateWordList();
+                alert(`成功导入 ${newWords.length} 个单词！`);
+            }
+        }
+
+        // 更新单词列表显示
+        function updateWordList() {
+            let wordListDiv = document.getElementById('wordList');
+            wordListDiv.innerHTML = '';
+            
+            if (wordDatabase.length === 0) {
+                wordListDiv.innerHTML = '<p>暂无单词，请先导入单词</p>';
+                return;
+            }
+            
+            wordDatabase.forEach(word => {
+                let wordItem = document.createElement('div');
+                wordItem.className = 'word-item';
+                wordItem.innerHTML = `
+                    <span>${word.english}</span>
+                    <span>${word.chinese}</span>
+                `;
+                wordListDiv.appendChild(wordItem);
+            });
+        }
+
+        // 切换提示类型
+        function toggleHintType() {
+            const types = ['chinese', 'english', 'pronunciation'];
+            const currentIndex = types.indexOf(gameState.hintType);
+            gameState.hintType = types[(currentIndex + 1) % types.length];
+            
+            // 更新当前提示
+            if (gameState.capturedCount < gameState.currentWords.length) {
+                setNextHint();
+            }
+        }
+
+        // 事件监听
+        document.getElementById('startBtn').addEventListener('click', initGame);
+        document.getElementById('resetBtn').addEventListener('click', function(e) {
+            e.preventDefault(); // 防止默认行为
+            initGame();
+        });
+        document.getElementById('restartBtn').addEventListener('click', function(e) {
+            e.preventDefault(); // 防止默认行为
+            initGame();
+        });
+        document.getElementById('importBtn').addEventListener('click', importWords);
+        document.getElementById('hintBtn').addEventListener('click', toggleHintType);
+        document.getElementById('skipWordBtn').addEventListener('click', skipWord);
+        
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault(); // 防止空格键滚动页面
+                fireHook();
+            }
+        });
+        
+        // 鼠标控制
+        canvas.addEventListener('click', () => {
+            fireHook();
+        });
+
+        // 初始化单词列表
+        updateWordList();
+        
+        // 初始绘制
+        drawGame();
+        
+        // 页面加载后自动开始游戏
+        window.addEventListener('load', function() {
+            // 延迟一点开始游戏，确保所有资源已加载
+            setTimeout(initGame, 500);
+        });
+    </script>
+</body>
+</html>
