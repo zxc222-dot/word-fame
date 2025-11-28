@@ -1,0 +1,2227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词秘境探险 - 音效优化版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 3.2rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(90deg, #ff9a9e, #fad0c4, #fad0c4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .game-container {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 角色选择界面 */
+        .character-selection {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .selection-title {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+        
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .character-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid transparent;
+        }
+        
+        .character-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border-color: #ffcc00;
+        }
+        
+        .character-card.selected {
+            border-color: #ffcc00;
+            background: rgba(255, 204, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+        }
+        
+        .character-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+        
+        .character-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .character-desc {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+        
+        .character-skill {
+            font-size: 0.9rem;
+            color: #ffcc00;
+            font-weight: 600;
+        }
+        
+        /* 难度选择 */
+        .difficulty-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        
+        .difficulty-btn {
+            padding: 10px 25px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .difficulty-btn.active {
+            background: rgba(255, 204, 0, 0.3);
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+        
+        /* 游戏界面 */
+        .game-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .player-stats {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .map-container {
+            width: 100%;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .map-path {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-50%);
+        }
+        
+        .map-node {
+            position: absolute;
+            top: 50%;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #4a4a4a;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .map-node.active {
+            background: #ffcc00;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+        }
+        
+        .map-node.completed {
+            background: #4CAF50;
+        }
+        
+        .map-node i {
+            font-size: 1.2rem;
+        }
+        
+        .game-content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .puzzle-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #ffcc00;
+            text-align: center;
+        }
+        
+        .word-display {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 20px 0 40px;
+            text-align: center;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            color: #ffcc00;
+        }
+        
+        .puzzle-container {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .timer-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .timer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+        
+        .game-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button.primary {
+            background: linear-gradient(90deg, #ff9a9e, #fad0c4);
+            color: #333;
+        }
+        
+        /* 道具栏 */
+        .inventory {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .item-count {
+            font-weight: 700;
+            color: #ffcc00;
+        }
+        
+        /* 结果界面 */
+        .result-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #ffcc00;
+        }
+        
+        .final-score {
+            font-size: 5rem;
+            font-weight: 700;
+            margin: 20px 0;
+            color: #ffeb3b;
+            text-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
+        }
+        
+        .result-message {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+        
+        .rewards {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .reward-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-width: 120px;
+        }
+        
+        .reward-icon {
+            font-size: 2.5rem;
+            color: #ffcc00;
+        }
+        
+        /* 音乐控制 */
+        .music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        
+        .music-control:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .music-icon {
+            font-size: 1.5rem;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .character-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .word-display {
+                font-size: 2.5rem;
+            }
+            
+            .game-header {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .word-display {
+                font-size: 2rem;
+            }
+            
+            .difficulty-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* 事件弹窗 */
+        .event-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            z-index: 1000;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 2px solid #ffcc00;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.5);
+            display: none;
+        }
+        
+        .event-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #ffcc00;
+        }
+        
+        .event-desc {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+        }
+        
+        .event-options {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .event-option {
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .event-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* 谜题类型特定样式 */
+        .matching-puzzle {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .word-item, .meaning-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .word-item:hover, .meaning-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .word-item.selected, .meaning-item.selected {
+            background: rgba(255, 204, 0, 0.3);
+        }
+        
+        .fill-blank-puzzle {
+            font-size: 2rem;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .blank-input {
+            width: 60px;
+            font-size: 1.5rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 5px;
+        }
+        
+        .sentence-puzzle {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        .sentence-input {
+            width: 200px;
+            font-size: 1.2rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 8px;
+            margin: 0 10px;
+        }
+        
+        .synonym-puzzle {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .synonym-input {
+            width: 200px;
+            font-size: 1.2rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 8px;
+            margin: 0 10px;
+        }
+        
+        .antonym-puzzle {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .antonym-input {
+            width: 200px;
+            font-size: 1.2rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 8px;
+            margin: 0 10px;
+        }
+        
+        /* 提示系统 */
+        .hint-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .hint-title {
+            font-size: 1.2rem;
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .hint-content {
+            font-size: 1.1rem;
+        }
+        
+        /* 单词卡片 */
+        .word-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .word-card-title {
+            font-size: 1.5rem;
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .word-card-content {
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+        
+        /* 迷你游戏 */
+        .minigame-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .minigame-title {
+            font-size: 1.5rem;
+            color: #ffcc00;
+            margin-bottom: 15px;
+        }
+        
+        .minigame-content {
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+        
+        .minigame-input {
+            width: 200px;
+            font-size: 1.2rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 8px;
+            margin: 10px;
+        }
+        
+        /* 音效控制 */
+        .sound-control {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        
+        .sound-control:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .sound-icon {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>单词秘境探险</h1>
+            <p class="subtitle">高中单词强化训练 - 开启你的词汇冒险之旅！</p>
+        </header>
+        
+        <!-- 音乐控制 -->
+        <div class="music-control" id="musicControl">
+            <div class="music-icon">🎵</div>
+        </div>
+        
+        <!-- 音效控制 -->
+        <div class="sound-control" id="soundControl">
+            <div class="sound-icon">🔊</div>
+        </div>
+        
+        <div class="game-container">
+            <!-- 角色选择界面 -->
+            <div class="character-selection" id="characterSelection">
+                <h2 class="selection-title">选择你的探险身份</h2>
+                
+                <div class="character-grid">
+                    <div class="character-card" data-character="hunter">
+                        <div class="character-icon">🏹</div>
+                        <div class="character-name">猎人</div>
+                        <div class="character-desc">敏锐的观察者，擅长快速反应</div>
+                        <div class="character-skill">技能：限时题额外+5秒</div>
+                    </div>
+                    <div class="character-card" data-character="scholar">
+                        <div class="character-icon">📚</div>
+                        <div class="character-name">学者</div>
+                        <div class="character-desc">知识渊博，善于思考分析</div>
+                        <div class="character-skill">技能：初始多2张提示券</div>
+                    </div>
+                    <div class="character-card" data-character="craftsman">
+                        <div class="character-icon">⚒️</div>
+                        <div class="character-name">工匠</div>
+                        <div class="character-desc">巧手匠心，善于修复物品</div>
+                        <div class="character-skill">技能：复活卡50%概率回收</div>
+                    </div>
+                </div>
+                
+                <!-- 难度选择 -->
+                <h2 class="selection-title" style="margin-top: 30px;">选择探险难度</h2>
+                <div class="difficulty-selector">
+                    <div class="difficulty-btn active" data-difficulty="easy">基础词汇</div>
+                    <div class="difficulty-btn" data-difficulty="medium">核心词汇</div>
+                    <div class="difficulty-btn" data-difficulty="hard">高级词汇</div>
+                </div>
+                
+                <button id="startAdventure" class="primary">
+                    <i class="fas fa-play"></i> 开始探险
+                </button>
+            </div>
+            
+            <!-- 游戏界面 -->
+            <div class="game-screen" id="gameScreen">
+                <div class="game-header">
+                    <div class="player-stats">
+                        <div class="stat">
+                            <i class="fas fa-heart" style="color: #ff5252;"></i>
+                            <span id="healthValue">5</span>/5
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-star" style="color: #ffcc00;"></i>
+                            <span id="scoreValue">0</span> 分
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-map-marker-alt" style="color: #4CAF50;"></i>
+                            <span id="locationValue">森林入口</span>
+                        </div>
+                    </div>
+                    <div class="player-stats">
+                        <div class="stat">
+                            <i class="fas fa-user" style="color: #64b5f6;"></i>
+                            <span id="characterName">猎人</span>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-shield-alt" style="color: #ba68c8;"></i>
+                            <span id="difficultyName">基础</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="map-container">
+                    <div class="map-path"></div>
+                    <div class="map-node completed" style="left: 10%;" data-node="1">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    <div class="map-node active" style="left: 30%;" data-node="2">
+                        <i class="fas fa-water"></i>
+                    </div>
+                    <div class="map-node" style="left: 50%;" data-node="3">
+                        <i class="fas fa-mountain"></i>
+                    </div>
+                    <div class="map-node" style="left: 70%;" data-node="4">
+                        <i class="fas fa-dungeon"></i>
+                    </div>
+                    <div class="map-node" style="left: 90%;" data-node="5">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                </div>
+                
+                <div class="game-content">
+                    <h2 class="puzzle-title" id="puzzleTitle">单词匹配挑战</h2>
+                    
+                    <!-- 谜题容器 - 动态加载不同谜题 -->
+                    <div class="puzzle-container" id="puzzleContainer">
+                        <!-- 谜题内容将在这里动态生成 -->
+                    </div>
+                    
+                    <div class="timer-container">
+                        <div class="timer-bar" id="timerBar"></div>
+                    </div>
+                    
+                    <div class="game-controls">
+                        <button id="useHint">
+                            <i class="fas fa-lightbulb"></i> 使用提示
+                        </button>
+                        <button id="nextPuzzle" disabled>
+                            <i class="fas fa-arrow-right"></i> 继续探险
+                        </button>
+                        <button id="quitAdventure">
+                            <i class="fas fa-door-open"></i> 退出探险
+                        </button>
+                    </div>
+                    
+                    <div class="inventory">
+                        <div class="item" id="hintItem">
+                            <i class="fas fa-lightbulb" style="color: #ffcc00;"></i>
+                            提示券 <span class="item-count" id="hintCount">3</span>
+                        </div>
+                        <div class="item" id="reviveItem">
+                            <i class="fas fa-redo" style="color: #4CAF50;"></i>
+                            复活卡 <span class="item-count" id="reviveCount">1</span>
+                        </div>
+                        <div class="item" id="detectorItem">
+                            <i class="fas fa-search" style="color: #64b5f6;"></i>
+                            探测仪 <span class="item-count" id="detectorCount">1</span>
+                        </div>
+                        <div class="item" id="swapItem">
+                            <i class="fas fa-exchange-alt" style="color: #ba68c8;"></i>
+                            交换卡 <span class="item-count" id="swapCount">1</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 结果界面 -->
+            <div class="result-screen" id="resultScreen">
+                <h2 class="result-title">探险完成!</h2>
+                <div class="final-score" id="finalScore">0</div>
+                <p class="result-message" id="resultMessage">你成功完成了单词秘境探险!</p>
+                
+                <div class="rewards">
+                    <div class="reward-item">
+                        <div class="reward-icon">🏆</div>
+                        <div>探险奖章</div>
+                    </div>
+                    <div class="reward-item">
+                        <div class="reward-icon">📚</div>
+                        <div>词汇手册</div>
+                    </div>
+                    <div class="reward-item">
+                        <div class="reward-icon">🔑</div>
+                        <div>隐藏区域钥匙</div>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button id="playAgainBtn" class="primary">
+                        <i class="fas fa-redo"></i> 再次探险
+                    </button>
+                    <button id="changeCharacterBtn">
+                        <i class="fas fa-user"></i> 更换身份
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 事件弹窗 -->
+    <div class="event-popup" id="eventPopup">
+        <h2 class="event-title" id="eventTitle">发现隐藏宝箱!</h2>
+        <p class="event-desc" id="eventDesc">你发现了一个古老的宝箱，里面似乎有珍贵的道具。是否打开？</p>
+        <div class="event-options">
+            <div class="event-option" id="eventOption1">打开宝箱</div>
+            <div class="event-option" id="eventOption2">谨慎离开</div>
+        </div>
+    </div>
+
+    <!-- 音频元素 -->
+    <audio id="backgroundMusic" loop>
+        <source src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- 音效元素 -->
+    <audio id="correctSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="wrongSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="clickSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="hintSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkle-3026.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="levelUpSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // 游戏数据 - 高中英语单词（优化版）
+        const gameData = {
+            easy: {
+                words: ["abandon", "ability", "abroad", "absence", "absolute", "absorb", "abstract", "academic", "accent", "accept"],
+                meanings: ["放弃", "能力", "在国外", "缺席", "绝对的", "吸收", "抽象的", "学术的", "口音", "接受"],
+                sentences: [
+                    "He decided to ____ his studies and travel the world.",
+                    "She has the ____ to solve complex problems quickly.",
+                    "Many students choose to study ____ for a year.",
+                    "His ____ from the meeting was noticed by everyone.",
+                    "We have ____ confidence in your abilities.",
+                    "Plants ____ water through their roots.",
+                    "The concept was too ____ for the students to understand.",
+                    "She pursued an ____ career in research.",
+                    "He spoke with a strong British ____.",
+                    "I gladly ____ your generous offer."
+                ],
+                fillBlanks: [
+                    "A_A_D_N", "A_I_I_Y", "A_R_A_", "A_S_N_E", "A_S_L_T_",
+                    "A_S_R_", "A_T_A_T", "A_A_E_I_", "A_C_N_", "A_C_E_T"
+                ],
+                synonyms: [
+                    "desert", "capability", "overseas", "nonattendance", "complete",
+                    "soak up", "theoretical", "scholarly", "pronunciation", "receive"
+                ],
+                antonyms: [
+                    "keep", "inability", "domestic", "presence", "relative",
+                    "release", "concrete", "practical", "silence", "refuse"
+                ],
+                hints: [
+                    "意思是放弃或离开，常用于放弃计划或责任",
+                    "指做某事的能力或技能，与capability同义",
+                    "表示在国外或海外，与overseas意思相近",
+                    "指不在场或缺席，反义词是presence",
+                    "表示完全或绝对的，没有任何限制或条件",
+                    "意思是吸收或吸入，如植物吸收水分",
+                    "表示抽象或理论性的，反义词是concrete",
+                    "与学术或教育相关，指学校或研究领域",
+                    "指说话的口音或语调，不同地区有不同的口音",
+                    "意思是接受或同意，反义词是refuse"
+                ]
+            },
+            medium: {
+                words: ["accommodate", "accompany", "accomplish", "account", "accumulate", "accurate", "accuse", "achieve", "acknowledge", "acquire"],
+                meanings: ["容纳", "陪伴", "完成", "账户", "积累", "准确的", "指责", "实现", "承认", "获得"],
+                sentences: [
+                    "The hotel can ____ up to 500 guests.",
+                    "Will you ____ me to the party?",
+                    "She managed to ____ all her goals for the year.",
+                    "Please give me an ____ of what happened.",
+                    "Dust tends to ____ in unused rooms.",
+                    "Make sure your measurements are ____.",
+                    "They ____ him of stealing the documents.",
+                    "With hard work, you can ____ anything.",
+                    "I must ____ that you were right all along.",
+                    "She hopes to ____ new skills during the internship."
+                ],
+                fillBlanks: [
+                    "A_C_M_O_A_E", "A_C_M_A_Y", "A_C_M_L_S_", "A_C_U_T", "A_C_M_L_T_",
+                    "A_C_R_T_", "A_C_S_", "A_H_E_E", "A_K_O_L_D_E", "A_U_R_"
+                ],
+                synonyms: [
+                    "house", "escort", "achieve", "report", "collect",
+                    "precise", "blame", "attain", "admit", "obtain"
+                ],
+                antonyms: [
+                    "evict", "leave", "fail", "conceal", "disperse",
+                    "inaccurate", "defend", "lose", "deny", "lose"
+                ],
+                hints: [
+                    "意思是容纳或提供住宿，酒店可以容纳客人",
+                    "表示陪伴或陪同，与escort意思相近",
+                    "指完成或实现目标，与achieve同义",
+                    "意思是账户或描述，也可以指银行账户",
+                    "表示积累或聚集，如灰尘在闲置房间积累",
+                    "指准确或精确的，反义词是inaccurate",
+                    "意思是指责或控告，常用于法律语境",
+                    "表示实现或达成，通过努力可以实现目标",
+                    "指承认或认可，承认某事的真实性",
+                    "意思是获得或取得，通过学习获得新技能"
+                ]
+            },
+            hard: {
+                words: ["benevolent", "bilateral", "biography", "bizarre", "blatant", "boundary", "boycott", "brevity", "brilliant", "bureaucracy"],
+                meanings: ["仁慈的", "双边的", "传记", "奇怪的", "公然的", "边界", "抵制", "简洁", "杰出的", "官僚制度"],
+                sentences: [
+                    "The ____ old man donated most of his wealth to charity.",
+                    "The two countries signed a ____ trade agreement.",
+                    "I'm reading a ____ of Albert Einstein.",
+                    "The artist's work is known for its ____ imagery.",
+                    "It was a ____ violation of the rules.",
+                    "The river forms the ____ between the two countries.",
+                    "They decided to ____ products from that company.",
+                    "The ____ of his speech made it very effective.",
+                    "She gave a ____ performance in the play.",
+                    "Dealing with ____ can be frustrating and time-consuming."
+                ],
+                fillBlanks: [
+                    "B_N_V_L_N_", "B_L_T_R_L", "B_O_R_P_Y", "B_Z_R_E", "B_A_A_T",
+                    "B_U_D_R_", "B_Y_O_T", "B_E_I_Y", "B_I_L_A_T", "B_R_A_C_A_Y"
+                ],
+                synonyms: [
+                    "kind", "mutual", "life story", "strange", "obvious",
+                    "border", "embargo", "conciseness", "excellent", "administration"
+                ],
+                antonyms: [
+                    "malevolent", "unilateral", "fiction", "normal", "subtle",
+                    "center", "support", "verbosity", "dull", "simplicity"
+                ],
+                hints: [
+                    "意思是仁慈或善良的，反义词是malevolent",
+                    "表示双边或双方的，涉及两个国家或团体",
+                    "指传记或个人生平，记录某人的一生",
+                    "意思是奇怪或怪异的，不同寻常的",
+                    "表示公然或明显的，毫不掩饰的",
+                    "指边界或界限，如河流形成的边界",
+                    "意思是抵制或拒绝，拒绝购买或使用",
+                    "表示简洁或简短，反义词是verbosity",
+                    "指杰出或出色的，非常优秀的",
+                    "意思是官僚制度或行政体系，复杂的行政管理"
+                ]
+            }
+        };
+
+        // 游戏状态
+        let gameState = {
+            currentCharacter: null,
+            currentDifficulty: 'easy',
+            currentNode: 2,
+            currentWordIndex: 0,
+            currentPuzzleType: 0, // 0: 释义配对, 1: 字母填空, 2: 例句猜词, 3: 同义词, 4: 反义词, 5: 单词卡片
+            score: 0,
+            health: 5,
+            timer: null,
+            timeLeft: 0,
+            totalTime: 25, // 延长答题时间
+            musicPlaying: false,
+            soundEnabled: true,
+            hints: 3,
+            revives: 1,
+            detectors: 1,
+            swaps: 1,
+            locations: ["森林入口", "灌木丛", "小溪边", "古树洞", "城堡大门", "秘境终点"],
+            puzzleTypes: ["释义配对", "字母填空", "例句猜词", "同义词挑战", "反义词挑战", "单词卡片"],
+            isProcessing: false // 防止重复点击
+        };
+
+        // DOM元素
+        const characterSelection = document.getElementById('characterSelection');
+        const gameScreen = document.getElementById('gameScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const startAdventureBtn = document.getElementById('startAdventure');
+        const nextPuzzleBtn = document.getElementById('nextPuzzle');
+        const quitAdventureBtn = document.getElementById('quitAdventure');
+        const useHintBtn = document.getElementById('useHint');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        const changeCharacterBtn = document.getElementById('changeCharacterBtn');
+        const healthValue = document.getElementById('healthValue');
+        const scoreValue = document.getElementById('scoreValue');
+        const locationValue = document.getElementById('locationValue');
+        const characterName = document.getElementById('characterName');
+        const difficultyName = document.getElementById('difficultyName');
+        const puzzleTitle = document.getElementById('puzzleTitle');
+        const puzzleContainer = document.getElementById('puzzleContainer');
+        const timerBar = document.getElementById('timerBar');
+        const finalScore = document.getElementById('finalScore');
+        const resultMessage = document.getElementById('resultMessage');
+        const musicControl = document.getElementById('musicControl');
+        const soundControl = document.getElementById('soundControl');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const correctSound = document.getElementById('correctSound');
+        const wrongSound = document.getElementById('wrongSound');
+        const clickSound = document.getElementById('clickSound');
+        const hintSound = document.getElementById('hintSound');
+        const levelUpSound = document.getElementById('levelUpSound');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+        const characterCards = document.querySelectorAll('.character-card');
+        const hintCount = document.getElementById('hintCount');
+        const reviveCount = document.getElementById('reviveCount');
+        const detectorCount = document.getElementById('detectorCount');
+        const swapCount = document.getElementById('swapCount');
+        const eventPopup = document.getElementById('eventPopup');
+        const eventTitle = document.getElementById('eventTitle');
+        const eventDesc = document.getElementById('eventDesc');
+        const eventOption1 = document.getElementById('eventOption1');
+        const eventOption2 = document.getElementById('eventOption2');
+
+        // 播放音效函数
+        function playSound(sound) {
+            if (gameState.soundEnabled) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("音效播放失败:", e));
+            }
+        }
+
+        // 角色卡片点击事件
+        characterCards.forEach(card => {
+            card.addEventListener('click', () => {
+                playSound(clickSound);
+                
+                // 移除之前选中的角色
+                characterCards.forEach(c => {
+                    c.classList.remove('selected');
+                });
+                
+                // 设置当前选中的角色
+                card.classList.add('selected');
+                gameState.currentCharacter = card.getAttribute('data-character');
+                
+                // 根据角色设置初始道具
+                if (gameState.currentCharacter === 'scholar') {
+                    gameState.hints = 5;
+                    hintCount.textContent = gameState.hints;
+                }
+                
+                // 猎人角色增加答题时间
+                if (gameState.currentCharacter === 'hunter') {
+                    gameState.totalTime = 30;
+                }
+            });
+        });
+
+        // 难度选择按钮点击事件
+        difficultyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                playSound(clickSound);
+                
+                difficultyBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                gameState.currentDifficulty = btn.getAttribute('data-difficulty');
+                
+                // 更新难度显示名称
+                const difficultyNames = {
+                    'easy': '基础',
+                    'medium': '核心',
+                    'hard': '高级'
+                };
+                difficultyName.textContent = difficultyNames[gameState.currentDifficulty];
+            });
+        });
+
+        // 音乐控制
+        musicControl.addEventListener('click', () => {
+            playSound(clickSound);
+            
+            if (gameState.musicPlaying) {
+                backgroundMusic.pause();
+                musicControl.style.background = 'rgba(255, 255, 255, 0.2)';
+            } else {
+                backgroundMusic.play().catch(e => {
+                    console.log("自动播放被阻止，需要用户交互");
+                });
+                musicControl.style.background = 'rgba(255, 255, 255, 0.4)';
+            }
+            gameState.musicPlaying = !gameState.musicPlaying;
+        });
+
+        // 音效控制
+        soundControl.addEventListener('click', () => {
+            playSound(clickSound);
+            
+            gameState.soundEnabled = !gameState.soundEnabled;
+            if (gameState.soundEnabled) {
+                soundControl.style.background = 'rgba(255, 255, 255, 0.4)';
+            } else {
+                soundControl.style.background = 'rgba(255, 255, 255, 0.2)';
+            }
+        });
+
+        // 开始探险按钮点击事件
+        startAdventureBtn.addEventListener('click', () => {
+            playSound(clickSound);
+            
+            if (!gameState.currentCharacter) {
+                showFeedback('请先选择一个探险身份！', false);
+                return;
+            }
+            
+            startAdventure();
+        });
+
+        // 使用提示按钮点击事件
+        useHintBtn.addEventListener('click', () => {
+            if (gameState.isProcessing) return;
+            playSound(clickSound);
+            
+            if (gameState.hints > 0) {
+                gameState.hints--;
+                hintCount.textContent = gameState.hints;
+                
+                // 根据当前谜题类型提供提示
+                provideHint();
+                
+                showFeedback('使用了一张提示券！', true);
+            } else {
+                showFeedback('提示券不足！', false);
+            }
+        });
+
+        // 下一题按钮点击事件
+        nextPuzzleBtn.addEventListener('click', () => {
+            if (gameState.isProcessing) return;
+            playSound(clickSound);
+            
+            // 随机触发事件
+            if (Math.random() < 0.4) {
+                triggerRandomEvent();
+            } else {
+                nextQuestion();
+            }
+        });
+
+        // 退出探险按钮点击事件
+        quitAdventureBtn.addEventListener('click', () => {
+            playSound(clickSound);
+            
+            if (confirm('确定要退出探险吗？当前进度将丢失。')) {
+                showCharacterSelection();
+            }
+        });
+
+        // 再玩一次按钮点击事件
+        playAgainBtn.addEventListener('click', () => {
+            playSound(clickSound);
+            startAdventure();
+        });
+
+        // 更换身份按钮点击事件
+        changeCharacterBtn.addEventListener('click', () => {
+            playSound(clickSound);
+            showCharacterSelection();
+        });
+
+        // 事件选项点击事件
+        eventOption1.addEventListener('click', () => {
+            playSound(clickSound);
+            handleEventOption(1);
+        });
+
+        eventOption2.addEventListener('click', () => {
+            playSound(clickSound);
+            handleEventOption(2);
+        });
+
+        // 开始探险
+        function startAdventure() {
+            // 重置游戏状态
+            gameState.currentNode = 2;
+            gameState.currentWordIndex = 0;
+            gameState.score = 0;
+            gameState.health = 5;
+            gameState.isProcessing = false;
+            
+            // 根据角色设置初始道具
+            if (gameState.currentCharacter === 'scholar') {
+                gameState.hints = 5;
+            } else {
+                gameState.hints = 3;
+            }
+            gameState.revives = 1;
+            gameState.detectors = 1;
+            gameState.swaps = 1;
+            
+            // 猎人角色增加答题时间
+            if (gameState.currentCharacter === 'hunter') {
+                gameState.totalTime = 30;
+            } else {
+                gameState.totalTime = 25;
+            }
+            
+            // 更新UI
+            healthValue.textContent = gameState.health;
+            scoreValue.textContent = gameState.score;
+            locationValue.textContent = gameState.locations[gameState.currentNode];
+            hintCount.textContent = gameState.hints;
+            reviveCount.textContent = gameState.revives;
+            detectorCount.textContent = gameState.detectors;
+            swapCount.textContent = gameState.swaps;
+            
+            // 更新角色名称显示
+            const characterNames = {
+                'hunter': '猎人',
+                'scholar': '学者',
+                'craftsman': '工匠'
+            };
+            characterName.textContent = characterNames[gameState.currentCharacter];
+            
+            // 更新地图节点
+            updateMapNodes();
+            
+            // 显示游戏界面
+            gameScreen.style.display = 'flex';
+            characterSelection.style.display = 'none';
+            resultScreen.style.display = 'none';
+            
+            // 加载第一个问题
+            loadQuestion();
+        }
+
+        // 更新地图节点
+        function updateMapNodes() {
+            document.querySelectorAll('.map-node').forEach((node, index) => {
+                const nodeNum = parseInt(node.getAttribute('data-node'));
+                node.classList.remove('active', 'completed');
+                
+                if (nodeNum < gameState.currentNode) {
+                    node.classList.add('completed');
+                } else if (nodeNum === gameState.currentNode) {
+                    node.classList.add('active');
+                }
+            });
+        }
+
+        // 加载问题
+        function loadQuestion() {
+            // 清除之前的计时器
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+            }
+            
+            // 重置状态
+            gameState.timeLeft = gameState.totalTime;
+            gameState.isProcessing = false;
+            timerBar.style.width = '100%';
+            nextPuzzleBtn.disabled = true;
+            
+            // 随机选择谜题类型
+            gameState.currentPuzzleType = Math.floor(Math.random() * 6);
+            
+            // 设置谜题标题
+            puzzleTitle.textContent = `${gameState.puzzleTypes[gameState.currentPuzzleType]}挑战`;
+            
+            // 根据谜题类型加载不同的内容
+            switch(gameState.currentPuzzleType) {
+                case 0: // 释义配对
+                    loadMatchingPuzzle();
+                    break;
+                case 1: // 字母填空
+                    loadFillBlankPuzzle();
+                    break;
+                case 2: // 例句猜词
+                    loadSentencePuzzle();
+                    break;
+                case 3: // 同义词挑战
+                    loadSynonymPuzzle();
+                    break;
+                case 4: // 反义词挑战
+                    loadAntonymPuzzle();
+                    break;
+                case 5: // 单词卡片
+                    loadWordCardPuzzle();
+                    break;
+            }
+            
+            // 开始计时
+            startTimer();
+        }
+
+        // 加载释义配对谜题
+        function loadMatchingPuzzle() {
+            const scenario = gameData[gameState.currentDifficulty];
+            
+            // 创建单词和释义容器
+            const wordsContainer = document.createElement('div');
+            wordsContainer.className = 'matching-puzzle';
+            
+            const meaningsContainer = document.createElement('div');
+            meaningsContainer.className = 'matching-puzzle';
+            
+            // 随机选择6个单词和释义
+            const selectedIndices = [];
+            while (selectedIndices.length < 6) {
+                const randomIndex = Math.floor(Math.random() * scenario.words.length);
+                if (!selectedIndices.includes(randomIndex)) {
+                    selectedIndices.push(randomIndex);
+                }
+            }
+            
+            // 打乱顺序
+            const shuffledIndices = [...selectedIndices].sort(() => Math.random() - 0.5);
+            const shuffledMeanings = [...selectedIndices].sort(() => Math.random() - 0.5);
+            
+            // 添加单词
+            shuffledIndices.forEach(index => {
+                const wordItem = document.createElement('div');
+                wordItem.className = 'word-item';
+                wordItem.textContent = scenario.words[index];
+                wordItem.dataset.index = index;
+                wordsContainer.appendChild(wordItem);
+            });
+            
+            // 添加释义
+            shuffledMeanings.forEach(index => {
+                const meaningItem = document.createElement('div');
+                meaningItem.className = 'meaning-item';
+                meaningItem.textContent = scenario.meanings[index];
+                meaningItem.dataset.index = index;
+                meaningsContainer.appendChild(meaningItem);
+            });
+            
+            // 清空容器并添加新内容
+            puzzleContainer.innerHTML = '';
+            puzzleContainer.appendChild(wordsContainer);
+            puzzleContainer.appendChild(meaningsContainer);
+            
+            // 添加点击事件
+            document.querySelectorAll('.word-item, .meaning-item').forEach(item => {
+                item.addEventListener('click', handleMatchingClick);
+            });
+            
+            // 添加提示
+            addHint("请将英文单词与正确的中文释义配对。点击一个单词，再点击一个释义，如果配对正确，它们会变成绿色。");
+        }
+
+        // 加载字母填空谜题
+        function loadFillBlankPuzzle() {
+            const scenario = gameData[gameState.currentDifficulty];
+            const currentWord = scenario.words[gameState.currentWordIndex];
+            const fillBlank = scenario.fillBlanks[gameState.currentWordIndex];
+            
+            // 创建填空显示
+            const fillBlankDisplay = document.createElement('div');
+            fillBlankDisplay.className = 'fill-blank-puzzle';
+            fillBlankDisplay.textContent = fillBlank;
+            
+            // 创建输入框
+            const inputContainer = document.createElement('div');
+            inputContainer.style.marginTop = '20px';
+            inputContainer.style.textAlign = 'center';
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'blank-input';
+            input.placeholder = '输入完整单词';
+            
+            const checkButton = document.createElement('button');
+            checkButton.textContent = '检查答案';
+            checkButton.style.marginLeft = '10px';
+            checkButton.addEventListener('click', () => {
+                if (gameState.isProcessing) return;
+                checkFillBlankAnswer(input.value, currentWord);
+            });
+            
+            inputContainer.appendChild(input);
+            inputContainer.appendChild(checkButton);
+            
+            // 清空容器并添加新内容
+            puzzleContainer.innerHTML = '';
+            puzzleContainer.appendChild(fillBlankDisplay);
+            puzzleContainer.appendChild(inputContainer);
+            
+            // 添加提示
+            addHint(`提示：${scenario.hints[gameState.currentWordIndex]}`);
+        }
+
+        // 加载例句猜词谜题
+        function loadSentencePuzzle() {
+            const scenario = gameData[gameState.currentDifficulty];
+            const currentSentence = scenario.sentences[gameState.currentWordIndex];
+            
+            // 创建句子显示
+            const sentenceDisplay = document.createElement('div');
+            sentenceDisplay.className = 'sentence-puzzle';
+            
+            // 将句子中的空白部分替换为输入框
+            const sentenceParts = currentSentence.split('____');
+            sentenceDisplay.innerHTML = `
+                ${sentenceParts[0]}
+                <input type="text" class="sentence-input" placeholder="输入单词">
+                ${sentenceParts[1]}
+            `;
+            
+            // 创建检查按钮
+            const checkButton = document.createElement('button');
+            checkButton.textContent = '检查答案';
+            checkButton.style.marginTop = '20px';
+            checkButton.addEventListener('click', () => {
+                if (gameState.isProcessing) return;
+                const input = document.querySelector('.sentence-input');
+                checkSentenceAnswer(input.value, scenario.words[gameState.currentWordIndex]);
+            });
+            
+            // 清空容器并添加新内容
+            puzzleContainer.innerHTML = '';
+            puzzleContainer.appendChild(sentenceDisplay);
+            puzzleContainer.appendChild(checkButton);
+            
+            // 添加提示
+            addHint(`提示：${scenario.hints[gameState.currentWordIndex]}`);
+        }
+
+        // 加载同义词挑战谜题
+        function loadSynonymPuzzle() {
+            const scenario = gameData[gameState.currentDifficulty];
+            const currentWord = scenario.words[gameState.currentWordIndex];
+            
+            // 创建同义词挑战显示
+            const synonymDisplay = document.createElement('div');
+            synonymDisplay.className = 'synonym-puzzle';
+            synonymDisplay.innerHTML = `
+                <p>单词: <strong>${currentWord}</strong></p>
+                <p>请输入一个同义词:</p>
+                <input type="text" class="synonym-input" placeholder="输入同义词">
+            `;
+            
+            // 创建检查按钮
+            const checkButton = document.createElement('button');
+            checkButton.textContent = '检查答案';
+            checkButton.style.marginTop = '20px';
+            checkButton.addEventListener('click', () => {
+                if (gameState.isProcessing) return;
+                const input = document.querySelector('.synonym-input');
+                checkSynonymAnswer(input.value, scenario.synonyms[gameState.currentWordIndex]);
+            });
+            
+            // 清空容器并添加新内容
+            puzzleContainer.innerHTML = '';
+            puzzleContainer.appendChild(synonymDisplay);
+            puzzleContainer.appendChild(checkButton);
+            
+            // 添加提示
+            addHint(`提示：${scenario.hints[gameState.currentWordIndex]}`);
+        }
+
+        // 加载反义词挑战谜题
+        function loadAntonymPuzzle() {
+            const scenario = gameData[gameState.currentDifficulty];
+            const currentWord = scenario.words[gameState.currentWordIndex];
+            
+            // 创建反义词挑战显示
+            const antonymDisplay = document.createElement('div');
+            antonymDisplay.className = 'antonym-puzzle';
+            antonymDisplay.innerHTML = `
+                <p>单词: <strong>${currentWord}</strong></p>
+                <p>请输入一个反义词:</p>
+                <input type="text" class="antonym-input" placeholder="输入反义词">
+            `;
+            
+            // 创建检查按钮
+            const checkButton = document.createElement('button');
+            checkButton.textContent = '检查答案';
+            checkButton.style.marginTop = '20px';
+            checkButton.addEventListener('click', () => {
+                if (gameState.isProcessing) return;
+                const input = document.querySelector('.antonym-input');
+                checkAntonymAnswer(input.value, scenario.antonyms[gameState.currentWordIndex]);
+            });
+            
+            // 清空容器并添加新内容
+            puzzleContainer.innerHTML = '';
+            puzzleContainer.appendChild(antonymDisplay);
+            puzzleContainer.appendChild(checkButton);
+            
+            // 添加提示
+            addHint(`提示：${scenario.hints[gameState.currentWordIndex]}`);
+        }
+
+        // 加载单词卡片谜题
+        function loadWordCardPuzzle() {
+            const scenario = gameData[gameState.currentDifficulty];
+            const currentWord = scenario.words[gameState.currentWordIndex];
+            const currentMeaning = scenario.meanings[gameState.currentWordIndex];
+            const currentSentence = scenario.sentences[gameState.currentWordIndex];
+            
+            // 创建单词卡片
+            const wordCard = document.createElement('div');
+            wordCard.className = 'word-card';
+            wordCard.innerHTML = `
+                <div class="word-card-title">单词卡片</div>
+                <div class="word-card-content">
+                    <p><strong>单词:</strong> ${currentWord}</p>
+                    <p><strong>释义:</strong> ${currentMeaning}</p>
+                    <p><strong>例句:</strong> ${currentSentence}</p>
+                    <p><strong>同义词:</strong> ${scenario.synonyms[gameState.currentWordIndex]}</p>
+                    <p><strong>反义词:</strong> ${scenario.antonyms[gameState.currentWordIndex]}</p>
+                </div>
+            `;
+            
+            // 创建记忆测试
+            const memoryTest = document.createElement('div');
+            memoryTest.className = 'minigame-container';
+            memoryTest.innerHTML = `
+                <div class="minigame-title">记忆测试</div>
+                <div class="minigame-content">
+                    <p>请回忆刚才学习的单词并填写：</p>
+                    <input type="text" class="minigame-input" placeholder="输入单词">
+                </div>
+            `;
+            
+            // 创建检查按钮
+            const checkButton = document.createElement('button');
+            checkButton.textContent = '检查答案';
+            checkButton.style.marginTop = '20px';
+            checkButton.addEventListener('click', () => {
+                if (gameState.isProcessing) return;
+                const input = document.querySelector('.minigame-input');
+                checkWordCardAnswer(input.value, currentWord);
+            });
+            
+            // 清空容器并添加新内容
+            puzzleContainer.innerHTML = '';
+            puzzleContainer.appendChild(wordCard);
+            puzzleContainer.appendChild(memoryTest);
+            puzzleContainer.appendChild(checkButton);
+            
+            // 添加提示
+            addHint("请仔细阅读单词卡片上的信息，然后完成记忆测试。");
+        }
+
+        // 添加提示
+        function addHint(hintText) {
+            const hintContainer = document.createElement('div');
+            hintContainer.className = 'hint-container';
+            hintContainer.innerHTML = `
+                <div class="hint-title">💡 提示</div>
+                <div class="hint-content">${hintText}</div>
+            `;
+            
+            puzzleContainer.appendChild(hintContainer);
+        }
+
+        // 处理配对点击
+        function handleMatchingClick(event) {
+            if (gameState.isProcessing) return;
+            playSound(clickSound);
+            
+            const item = event.currentTarget;
+            
+            // 切换选中状态
+            if (item.classList.contains('selected')) {
+                item.classList.remove('selected');
+            } else {
+                item.classList.add('selected');
+            }
+            
+            // 检查是否有一对选中的项目
+            const selectedWords = document.querySelectorAll('.word-item.selected');
+            const selectedMeanings = document.querySelectorAll('.meaning-item.selected');
+            
+            if (selectedWords.length === 1 && selectedMeanings.length === 1) {
+                gameState.isProcessing = true;
+                
+                const wordIndex = selectedWords[0].dataset.index;
+                const meaningIndex = selectedMeanings[0].dataset.index;
+                
+                if (wordIndex === meaningIndex) {
+                    // 正确配对
+                    playSound(correctSound);
+                    selectedWords[0].style.background = 'rgba(76, 175, 80, 0.7)';
+                    selectedMeanings[0].style.background = 'rgba(76, 175, 80, 0.7)';
+                    selectedWords[0].classList.remove('selected');
+                    selectedMeanings[0].classList.remove('selected');
+                    
+                    // 检查是否所有配对都已完成
+                    const remainingWords = document.querySelectorAll('.word-item:not([style*="background"])');
+                    if (remainingWords.length === 0) {
+                        gameState.score += 15;
+                        scoreValue.textContent = gameState.score;
+                        showFeedback('全部配对正确！+15分', true);
+                        nextPuzzleBtn.disabled = false;
+                        clearInterval(gameState.timer);
+                    }
+                } else {
+                    // 错误配对
+                    playSound(wrongSound);
+                    selectedWords[0].style.background = 'rgba(244, 67, 54, 0.7)';
+                    selectedMeanings[0].style.background = 'rgba(244, 67, 54, 0.7)';
+                    setTimeout(() => {
+                        selectedWords[0].style.background = '';
+                        selectedMeanings[0].style.background = '';
+                        selectedWords[0].classList.remove('selected');
+                        selectedMeanings[0].classList.remove('selected');
+                        gameState.isProcessing = false;
+                    }, 1000);
+                    
+                    gameState.health--;
+                    healthValue.textContent = gameState.health;
+                    showFeedback('配对错误！-1点体力', false);
+                    
+                    // 检查游戏是否结束
+                    if (gameState.health <= 0) {
+                        if (gameState.revives > 0) {
+                            gameState.revives--;
+                            reviveCount.textContent = gameState.revives;
+                            gameState.health = 3;
+                            healthValue.textContent = gameState.health;
+                            showFeedback('使用了复活卡！体力恢复至3点', true);
+                        } else {
+                            setTimeout(() => {
+                                endAdventure(false);
+                            }, 1500);
+                            return;
+                        }
+                    }
+                }
+                gameState.isProcessing = false;
+            }
+        }
+
+        // 检查填空答案
+        function checkFillBlankAnswer(answer, correctAnswer) {
+            gameState.isProcessing = true;
+            
+            if (answer.toLowerCase() === correctAnswer.toLowerCase()) {
+                playSound(correctSound);
+                gameState.score += 12;
+                scoreValue.textContent = gameState.score;
+                showFeedback('填空正确！+12分', true);
+                nextPuzzleBtn.disabled = false;
+                clearInterval(gameState.timer);
+            } else {
+                playSound(wrongSound);
+                gameState.health--;
+                healthValue.textContent = gameState.health;
+                showFeedback('填空错误！-1点体力', false);
+                
+                // 检查游戏是否结束
+                if (gameState.health <= 0) {
+                    if (gameState.revives > 0) {
+                        gameState.revives--;
+                        reviveCount.textContent = gameState.revives;
+                        gameState.health = 3;
+                        healthValue.textContent = gameState.health;
+                        showFeedback('使用了复活卡！体力恢复至3点', true);
+                    } else {
+                        setTimeout(() => {
+                            endAdventure(false);
+                        }, 1500);
+                        return;
+                    }
+                }
+            }
+            gameState.isProcessing = false;
+        }
+
+        // 检查句子答案
+        function checkSentenceAnswer(answer, correctAnswer) {
+            gameState.isProcessing = true;
+            
+            if (answer.toLowerCase() === correctAnswer.toLowerCase()) {
+                playSound(correctSound);
+                gameState.score += 12;
+                scoreValue.textContent = gameState.score;
+                showFeedback('猜词正确！+12分', true);
+                nextPuzzleBtn.disabled = false;
+                clearInterval(gameState.timer);
+            } else {
+                playSound(wrongSound);
+                gameState.health--;
+                healthValue.textContent = gameState.health;
+                showFeedback('猜词错误！-1点体力', false);
+                
+                // 检查游戏是否结束
+                if (gameState.health <= 0) {
+                    if (gameState.revives > 0) {
+                        gameState.revives--;
+                        reviveCount.textContent = gameState.revives;
+                        gameState.health = 3;
+                        healthValue.textContent = gameState.health;
+                        showFeedback('使用了复活卡！体力恢复至3点', true);
+                    } else {
+                        setTimeout(() => {
+                            endAdventure(false);
+                        }, 1500);
+                        return;
+                    }
+                }
+            }
+            gameState.isProcessing = false;
+        }
+
+        // 检查同义词答案
+        function checkSynonymAnswer(answer, correctAnswer) {
+            gameState.isProcessing = true;
+            
+            if (answer.toLowerCase() === correctAnswer.toLowerCase()) {
+                playSound(correctSound);
+                gameState.score += 12;
+                scoreValue.textContent = gameState.score;
+                showFeedback('同义词正确！+12分', true);
+                nextPuzzleBtn.disabled = false;
+                clearInterval(gameState.timer);
+            } else {
+                playSound(wrongSound);
+                gameState.health--;
+                healthValue.textContent = gameState.health;
+                showFeedback('同义词错误！-1点体力', false);
+                
+                // 检查游戏是否结束
+                if (gameState.health <= 0) {
+                    if (gameState.revives > 0) {
+                        gameState.revives--;
+                        reviveCount.textContent = gameState.revives;
+                        gameState.health = 3;
+                        healthValue.textContent = gameState.health;
+                        showFeedback('使用了复活卡！体力恢复至3点', true);
+                    } else {
+                        setTimeout(() => {
+                            endAdventure(false);
+                        }, 1500);
+                        return;
+                    }
+                }
+            }
+            gameState.isProcessing = false;
+        }
+
+        // 检查反义词答案
+        function checkAntonymAnswer(answer, correctAnswer) {
+            gameState.isProcessing = true;
+            
+            if (answer.toLowerCase() === correctAnswer.toLowerCase()) {
+                playSound(correctSound);
+                gameState.score += 12;
+                scoreValue.textContent = gameState.score;
+                showFeedback('反义词正确！+12分', true);
+                nextPuzzleBtn.disabled = false;
+                clearInterval(gameState.timer);
+            } else {
+                playSound(wrongSound);
+                gameState.health--;
+                healthValue.textContent = gameState.health;
+                showFeedback('反义词错误！-1点体力', false);
+                
+                // 检查游戏是否结束
+                if (gameState.health <= 0) {
+                    if (gameState.revives > 0) {
+                        gameState.revives--;
+                        reviveCount.textContent = gameState.revives;
+                        gameState.health = 3;
+                        healthValue.textContent = gameState.health;
+                        showFeedback('使用了复活卡！体力恢复至3点', true);
+                    } else {
+                        setTimeout(() => {
+                            endAdventure(false);
+                        }, 1500);
+                        return;
+                    }
+                }
+            }
+            gameState.isProcessing = false;
+        }
+
+        // 检查单词卡片答案
+        function checkWordCardAnswer(answer, correctAnswer) {
+            gameState.isProcessing = true;
+            
+            if (answer.toLowerCase() === correctAnswer.toLowerCase()) {
+                playSound(correctSound);
+                gameState.score += 15;
+                scoreValue.textContent = gameState.score;
+                showFeedback('记忆测试正确！+15分', true);
+                nextPuzzleBtn.disabled = false;
+                clearInterval(gameState.timer);
+            } else {
+                playSound(wrongSound);
+                gameState.health--;
+                healthValue.textContent = gameState.health;
+                showFeedback('记忆测试错误！-1点体力', false);
+                
+                // 检查游戏是否结束
+                if (gameState.health <= 0) {
+                    if (gameState.revives > 0) {
+                        gameState.revives--;
+                        reviveCount.textContent = gameState.revives;
+                        gameState.health = 3;
+                        healthValue.textContent = gameState.health;
+                        showFeedback('使用了复活卡！体力恢复至3点', true);
+                    } else {
+                        setTimeout(() => {
+                            endAdventure(false);
+                        }, 1500);
+                        return;
+                    }
+                }
+            }
+            gameState.isProcessing = false;
+        }
+
+        // 提供提示
+        function provideHint() {
+            playSound(hintSound);
+            
+            const scenario = gameData[gameState.currentDifficulty];
+            
+            switch(gameState.currentPuzzleType) {
+                case 0: // 释义配对
+                    // 随机显示一个正确配对
+                    const wordItems = document.querySelectorAll('.word-item');
+                    const meaningItems = document.querySelectorAll('.meaning-item');
+                    
+                    const randomIndex = Math.floor(Math.random() * wordItems.length);
+                    const correctWord = wordItems[randomIndex];
+                    const correctMeaning = Array.from(meaningItems).find(item => 
+                        item.dataset.index === correctWord.dataset.index
+                    );
+                    
+                    correctWord.style.background = 'rgba(255, 204, 0, 0.5)';
+                    correctMeaning.style.background = 'rgba(255, 204, 0, 0.5)';
+                    
+                    setTimeout(() => {
+                        correctWord.style.background = '';
+                        correctMeaning.style.background = '';
+                    }, 2000);
+                    break;
+                case 1: // 字母填空
+                    const currentWord = scenario.words[gameState.currentWordIndex];
+                    const input = document.querySelector('.blank-input');
+                    input.value = currentWord;
+                    break;
+                case 2: // 例句猜词
+                    const sentenceInput = document.querySelector('.sentence-input');
+                    const correctWordForSentence = scenario.words[gameState.currentWordIndex];
+                    sentenceInput.value = correctWordForSentence;
+                    break;
+                case 3: // 同义词挑战
+                    const synonymInput = document.querySelector('.synonym-input');
+                    const correctSynonym = scenario.synonyms[gameState.currentWordIndex];
+                    synonymInput.value = correctSynonym;
+                    break;
+                case 4: // 反义词挑战
+                    const antonymInput = document.querySelector('.antonym-input');
+                    const correctAntonym = scenario.antonyms[gameState.currentWordIndex];
+                    antonymInput.value = correctAntonym;
+                    break;
+                case 5: // 单词卡片
+                    const minigameInput = document.querySelector('.minigame-input');
+                    const correctWordForCard = scenario.words[gameState.currentWordIndex];
+                    minigameInput.value = correctWordForCard;
+                    break;
+            }
+        }
+
+        // 显示反馈
+        function showFeedback(message, isSuccess) {
+            const feedback = document.createElement('div');
+            feedback.textContent = message;
+            feedback.style.position = 'fixed';
+            feedback.style.top = '50%';
+            feedback.style.left = '50%';
+            feedback.style.transform = 'translate(-50%, -50%)';
+            feedback.style.background = isSuccess ? 'rgba(76, 175, 80, 0.9)' : 'rgba(244, 67, 54, 0.9)';
+            feedback.style.color = 'white';
+            feedback.style.padding = '20px 40px';
+            feedback.style.borderRadius = '10px';
+            feedback.style.fontSize = '1.5rem';
+            feedback.style.fontWeight = 'bold';
+            feedback.style.zIndex = '1000';
+            feedback.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
+            
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                document.body.removeChild(feedback);
+            }, 1500);
+        }
+
+        // 开始计时器
+        function startTimer() {
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                const percentage = (gameState.timeLeft / gameState.totalTime) * 100;
+                timerBar.style.width = `${percentage}%`;
+                
+                // 时间到
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timer);
+                    handleTimeUp();
+                }
+            }, 1000);
+        }
+
+        // 时间到处理
+        function handleTimeUp() {
+            playSound(wrongSound);
+            
+            const scenario = gameData[gameState.currentDifficulty];
+            
+            // 根据不同谜题类型处理超时
+            switch(gameState.currentPuzzleType) {
+                case 0: // 释义配对
+                    // 显示所有正确配对
+                    document.querySelectorAll('.word-item').forEach(wordItem => {
+                        const correctMeaning = Array.from(document.querySelectorAll('.meaning-item')).find(item => 
+                            item.dataset.index === wordItem.dataset.index
+                        );
+                        wordItem.style.background = 'rgba(76, 175, 80, 0.7)';
+                        correctMeaning.style.background = 'rgba(76, 175, 80, 0.7)';
+                    });
+                    break;
+                case 1: // 字母填空
+                    const currentWord = scenario.words[gameState.currentWordIndex];
+                    const input = document.querySelector('.blank-input');
+                    input.value = currentWord;
+                    break;
+                case 2: // 例句猜词
+                    const sentenceInput = document.querySelector('.sentence-input');
+                    const correctWordForSentence = scenario.words[gameState.currentWordIndex];
+                    sentenceInput.value = correctWordForSentence;
+                    break;
+                case 3: // 同义词挑战
+                    const synonymInput = document.querySelector('.synonym-input');
+                    const correctSynonym = scenario.synonyms[gameState.currentWordIndex];
+                    synonymInput.value = correctSynonym;
+                    break;
+                case 4: // 反义词挑战
+                    const antonymInput = document.querySelector('.antonym-input');
+                    const correctAntonym = scenario.antonyms[gameState.currentWordIndex];
+                    antonymInput.value = correctAntonym;
+                    break;
+                case 5: // 单词卡片
+                    const minigameInput = document.querySelector('.minigame-input');
+                    const correctWordForCard = scenario.words[gameState.currentWordIndex];
+                    minigameInput.value = correctWordForCard;
+                    break;
+            }
+            
+            // 扣减体力
+            gameState.health--;
+            healthValue.textContent = gameState.health;
+            
+            // 检查游戏是否结束
+            if (gameState.health <= 0) {
+                if (gameState.revives > 0) {
+                    gameState.revives--;
+                    reviveCount.textContent = gameState.revives;
+                    gameState.health = 3;
+                    healthValue.textContent = gameState.health;
+                    showFeedback('时间到！使用了复活卡！体力恢复至3点', false);
+                } else {
+                    setTimeout(() => {
+                        endAdventure(false);
+                    }, 1500);
+                    return;
+                }
+            } else {
+                showFeedback('时间到！-1点体力', false);
+            }
+            
+            // 启用下一题按钮
+            nextPuzzleBtn.disabled = false;
+        }
+
+        // 触发随机事件
+        function triggerRandomEvent() {
+            const events = [
+                {
+                    title: "发现隐藏宝箱!",
+                    desc: "你发现了一个古老的宝箱，里面似乎有珍贵的道具。是否打开？",
+                    option1: "打开宝箱",
+                    option2: "谨慎离开",
+                    result1: () => {
+                        // 宝箱奖励
+                        const rewardType = Math.floor(Math.random() * 3);
+                        if (rewardType === 0) {
+                            gameState.hints += 2;
+                            hintCount.textContent = gameState.hints;
+                            return "获得2张提示券！";
+                        } else if (rewardType === 1) {
+                            gameState.revives += 1;
+                            reviveCount.textContent = gameState.revives;
+                            return "获得1张复活卡！";
+                        } else {
+                            gameState.score += 20;
+                            scoreValue.textContent = gameState.score;
+                            return "获得20点探险分数！";
+                        }
+                    },
+                    result2: "你谨慎地离开了，没有冒险打开宝箱。"
+                },
+                {
+                    title: "遇到神秘商人",
+                    desc: "一位神秘的商人出现在你面前，他愿意用1张复活卡交换2张提示券。是否交易？",
+                    option1: "进行交易",
+                    option2: "拒绝交易",
+                    result1: () => {
+                        if (gameState.hints >= 2) {
+                            gameState.hints -= 2;
+                            gameState.revives += 1;
+                            hintCount.textContent = gameState.hints;
+                            reviveCount.textContent = gameState.revives;
+                            return "交易成功！获得1张复活卡。";
+                        } else {
+                            return "提示券不足，交易失败。";
+                        }
+                    },
+                    result2: "你拒绝了交易，继续前行。"
+                },
+                {
+                    title: "体力消耗",
+                    desc: "前方的道路异常崎岖，消耗了大量体力。你需要回答一个简单问题来恢复体力。",
+                    option1: "接受挑战",
+                    option2: "绕道而行",
+                    result1: () => {
+                        // 简单问题 - 这里简化处理，直接给予奖励
+                        gameState.health = Math.min(gameState.health + 1, 5);
+                        healthValue.textContent = gameState.health;
+                        return "回答正确！恢复1点体力。";
+                    },
+                    result2: "你选择了绕道，但消耗了更多时间。"
+                }
+            ];
+            
+            const randomEvent = events[Math.floor(Math.random() * events.length)];
+            
+            eventTitle.textContent = randomEvent.title;
+            eventDesc.textContent = randomEvent.desc;
+            eventOption1.textContent = randomEvent.option1;
+            eventOption2.textContent = randomEvent.option2;
+            
+            // 存储当前事件结果函数
+            eventPopup.currentEvent = randomEvent;
+            
+            eventPopup.style.display = 'block';
+        }
+
+        // 处理事件选项
+        function handleEventOption(option) {
+            let resultMessage = "";
+            
+            if (option === 1) {
+                if (typeof eventPopup.currentEvent.result1 === 'function') {
+                    resultMessage = eventPopup.currentEvent.result1();
+                } else {
+                    resultMessage = eventPopup.currentEvent.result1;
+                }
+            } else {
+                resultMessage = eventPopup.currentEvent.result2;
+            }
+            
+            eventPopup.style.display = 'none';
+            showFeedback(resultMessage, true);
+            
+            // 继续下一题
+            setTimeout(() => {
+                nextQuestion();
+            }, 1500);
+        }
+
+        // 下一题
+        function nextQuestion() {
+            gameState.currentWordIndex++;
+            
+            if (gameState.currentWordIndex >= 10) {
+                // 完成当前节点
+                playSound(levelUpSound);
+                gameState.currentNode++;
+                locationValue.textContent = gameState.locations[gameState.currentNode];
+                updateMapNodes();
+                
+                if (gameState.currentNode >= 5) {
+                    // 探险完成
+                    endAdventure(true);
+                } else {
+                    // 重置单词索引，进入下一区域
+                    gameState.currentWordIndex = 0;
+                    loadQuestion();
+                }
+            } else {
+                // 加载下一题
+                loadQuestion();
+            }
+        }
+
+        // 结束探险
+        function endAdventure(success) {
+            // 显示结果界面
+            resultScreen.style.display = 'flex';
+            gameScreen.style.display = 'none';
+            
+            // 更新最终得分
+            finalScore.textContent = gameState.score;
+            
+            // 根据结果显示不同消息
+            if (success) {
+                resultMessage.textContent = '恭喜！你成功完成了单词秘境探险！';
+            } else {
+                resultMessage.textContent = '探险失败！你的体力已耗尽。';
+            }
+        }
+
+        // 显示角色选择界面
+        function showCharacterSelection() {
+            characterSelection.style.display = 'flex';
+            gameScreen.style.display = 'none';
+            resultScreen.style.display = 'none';
+        }
+
+        // 初始化：默认选择第一个角色和难度
+        document.querySelector('.character-card').click();
+        document.querySelector('.difficulty-btn').click();
+    </script>
+</body>
+</html>

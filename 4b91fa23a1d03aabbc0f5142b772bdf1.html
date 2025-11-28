@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词守卫战：保卫萝卜英语学习游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c 0%, #2a4d8e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            color: #FFD700;
+        }
+        
+        .game-description {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto 20px;
+            line-height: 1.6;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .game-area {
+            display: flex;
+            width: 100%;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .game-board {
+            flex: 3;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            position: relative;
+            min-height: 500px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-controls {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 改进的萝卜设计 */
+        .carrot-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 100px;
+            height: 120px;
+            z-index: 10;
+        }
+        
+        .carrot {
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+            width: 60px;
+            height: 90px;
+            background: linear-gradient(135deg, #FF8C00, #FFA500);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .carrot::before {
+            content: "";
+            position: absolute;
+            top: -20px;
+            left: 15px;
+            width: 30px;
+            height: 40px;
+            background: linear-gradient(135deg, #32CD32, #228B22);
+            border-radius: 50% 50% 0 0;
+            transform: rotate(-15deg);
+        }
+        
+        .carrot::after {
+            content: "";
+            position: absolute;
+            top: -15px;
+            left: 25px;
+            width: 20px;
+            height: 30px;
+            background: linear-gradient(135deg, #32CD32, #228B22);
+            border-radius: 50% 50% 0 0;
+            transform: rotate(15deg);
+        }
+        
+        .carrot-face {
+            position: absolute;
+            top: 30px;
+            left: 20px;
+            width: 20px;
+            height: 20px;
+        }
+        
+        .carrot-eye {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #333;
+            border-radius: 50%;
+        }
+        
+        .carrot-eye.left {
+            left: 0;
+        }
+        
+        .carrot-eye.right {
+            right: 0;
+        }
+        
+        .carrot-mouth {
+            position: absolute;
+            bottom: 0;
+            left: 5px;
+            width: 10px;
+            height: 5px;
+            border-bottom: 2px solid #333;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .carrot.hurt {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .path {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80%;
+            height: 60px;
+            background: rgba(139, 69, 19, 0.5);
+            border-radius: 30px 0 0 0;
+        }
+        
+        /* 改进的怪物设计 - 清晰的形状和单词显示 */
+        .monster {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 5;
+            animation: float 3s infinite ease-in-out;
+            transition: all 0.3s ease;
+        }
+        
+        .monster-body {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .monster-word {
+            position: absolute;
+            top: -25px;
+            width: 120px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 3px 8px;
+            border-radius: 10px;
+            z-index: 6;
+        }
+        
+        .monster.selected .monster-word {
+            background: rgba(255, 215, 0, 0.7);
+            color: #333;
+        }
+        
+        .monster.selected .monster-body {
+            box-shadow: 0 0 0 3px #FFD700;
+        }
+        
+        .monster-features {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+        
+        .monster-eye {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            top: 25px;
+        }
+        
+        .monster-eye.left {
+            left: 20px;
+        }
+        
+        .monster-eye.right {
+            right: 20px;
+        }
+        
+        .monster-pupil {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #333;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+        }
+        
+        .monster-mouth {
+            position: absolute;
+            width: 30px;
+            height: 15px;
+            border-bottom: 3px solid #333;
+            border-radius: 0 0 15px 15px;
+            bottom: 20px;
+            left: 25px;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .monster.eliminated {
+            animation: explode 0.5s forwards;
+        }
+        
+        @keyframes explode {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+        
+        .explosion {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 6;
+            background: radial-gradient(circle, #FFD700 0%, #FF8C00 50%, transparent 70%);
+            animation: explosionEffect 0.6s forwards;
+        }
+        
+        @keyframes explosionEffect {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+        
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .option {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+        
+        .option:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        .option.correct {
+            background: rgba(76, 175, 80, 0.7);
+            border-color: #4CAF50;
+            animation: pulse 0.5s;
+        }
+        
+        .option.incorrect {
+            background: rgba(244, 67, 54, 0.7);
+            border-color: #F44336;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #FFD700;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #FF8C00, #FFA500);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .level-indicator {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .word-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            border-radius: 15px;
+        }
+        
+        .game-over h2 {
+            font-size: 3rem;
+            color: #FFD700;
+            margin-bottom: 20px;
+        }
+        
+        .game-over p {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .score-popup {
+            position: absolute;
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 1.5rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            z-index: 15;
+            animation: scoreFloat 1.5s forwards;
+        }
+        
+        @keyframes scoreFloat {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+            }
+            
+            .game-board {
+                min-height: 400px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>单词守卫战：保卫萝卜</h1>
+            <div class="game-description">
+                <p>欢迎来到单词守卫战！你的任务是保护萝卜不被单词怪物吃掉。每个怪物身上都有一个英文单词，从右侧选择正确的中文释义来消灭它们。小心，如果怪物到达萝卜，萝卜就会受伤！</p>
+            </div>
+        </header>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label">关卡</div>
+                <div class="stat-value" id="level">1</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">分数</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">萝卜生命</div>
+                <div class="stat-value" id="lives">5</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">剩余怪物</div>
+                <div class="stat-value" id="remaining">8</div>
+            </div>
+        </div>
+        
+        <div class="game-area">
+            <div class="game-board" id="gameBoard">
+                <div class="path"></div>
+                <div class="carrot-container">
+                    <div class="carrot" id="carrot">
+                        <div class="carrot-face">
+                            <div class="carrot-eye left"></div>
+                            <div class="carrot-eye right"></div>
+                            <div class="carrot-mouth"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 怪物将通过JavaScript动态添加 -->
+            </div>
+            
+            <div class="game-controls">
+                <div class="level-indicator">第 <span id="currentLevel">1</span> 关</div>
+                
+                <div class="word-display" id="currentWord">
+                    选择一个怪物开始游戏
+                </div>
+                
+                <div class="options-container" id="optionsContainer">
+                    <!-- 选项将通过JavaScript动态添加 -->
+                </div>
+                
+                <button class="btn" id="startBtn">开始游戏</button>
+                <button class="btn" id="nextLevelBtn" disabled>下一关</button>
+                
+                <div class="instructions">
+                    <p><strong>游戏说明：</strong></p>
+                    <p>1. 点击开始游戏，怪物将开始移动</p>
+                    <p>2. 点击怪物选择当前单词</p>
+                    <p>3. 从右侧选择正确的中文释义</p>
+                    <p>4. 正确选择将消灭怪物并获得分数</p>
+                    <p>5. 错误选择或让怪物到达萝卜将失去生命</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 高中英语单词数据库
+        const wordDatabase = [
+            { english: "abandon", chinese: "放弃，遗弃" },
+            { english: "abundant", chinese: "丰富的，充裕的" },
+            { english: "accommodate", chinese: "容纳，使适应" },
+            { english: "accomplish", chinese: "完成，实现" },
+            { english: "accurate", chinese: "精确的，准确的" },
+            { english: "acknowledge", chinese: "承认，确认" },
+            { english: "acquire", chinese: "获得，取得" },
+            { english: "adapt", chinese: "适应，调整" },
+            { english: "adequate", chinese: "足够的，适当的" },
+            { english: "adjacent", chinese: "邻近的，毗连的" },
+            { english: "adjust", chinese: "调整，适应" },
+            { english: "administration", chinese: "管理，行政" },
+            { english: "advocate", chinese: "提倡，主张" },
+            { english: "aesthetic", chinese: "美学的，审美的" },
+            { english: "affection", chinese: "喜爱，感情" },
+            { english: "aggregate", chinese: "总计，集合" },
+            { english: "allocate", chinese: "分配，分派" },
+            { english: "alternative", chinese: "替代的，供选择的" },
+            { english: "ambiguous", chinese: "模糊的，不明确的" },
+            { english: "ambitious", chinese: "有雄心的，野心勃勃的" },
+            { english: "amend", chinese: "修正，改进" },
+            { english: "analogy", chinese: "类比，相似" },
+            { english: "analyze", chinese: "分析，解析" },
+            { english: "anticipate", chinese: "预期，期望" },
+            { english: "apparent", chinese: "明显的，表面上的" },
+            { english: "appreciate", chinese: "欣赏，感激" },
+            { english: "approach", chinese: "方法，接近" },
+            { english: "appropriate", chinese: "适当的，合适的" },
+            { english: "approximate", chinese: "近似的，大约的" },
+            { english: "arbitrary", chinese: "任意的，武断的" },
+            { english: "aspect", chinese: "方面，外观" },
+            { english: "assemble", chinese: "集合，组装" },
+            { english: "assess", chinese: "评估，评定" },
+            { english: "assume", chinese: "假设，承担" },
+            { english: "assurance", chinese: "保证，确信" },
+            { english: "attain", chinese: "达到，获得" },
+            { english: "attribute", chinese: "属性，归因于" },
+            { english: "authentic", chinese: "真实的，可信的" },
+            { english: "authority", chinese: "权威，权力" },
+            { english: "automatic", chinese: "自动的，无意识的" },
+            { english: "available", chinese: "可用的，可获得的" },
+            { english: "aware", chinese: "意识到的，知道的" },
+            { english: "benefit", chinese: "利益，好处" },
+            { english: "bias", chinese: "偏见，偏心" },
+            { english: "bond", chinese: "债券，联系" },
+            { english: "brief", chinese: "简短的，简洁的" },
+            { english: "bulk", chinese: "体积，大部分" },
+            { english: "capable", chinese: "有能力的，能干的" },
+            { english: "capacity", chinese: "能力，容量" },
+            { english: "challenge", chinese: "挑战，质疑" },
+            { english: "channel", chinese: "频道，渠道" }
+        ];
+
+        // 游戏状态
+        const gameState = {
+            currentLevel: 1,
+            score: 0,
+            lives: 5,
+            isPlaying: false,
+            selectedMonster: null,
+            monsters: [],
+            currentWords: [],
+            remainingMonsters: 8
+        };
+
+        // DOM元素
+        const gameBoard = document.getElementById('gameBoard');
+        const currentWordDisplay = document.getElementById('currentWord');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const startBtn = document.getElementById('startBtn');
+        const nextLevelBtn = document.getElementById('nextLevelBtn');
+        const levelDisplay = document.getElementById('level');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const remainingDisplay = document.getElementById('remaining');
+        const currentLevelDisplay = document.getElementById('currentLevel');
+        const carrot = document.getElementById('carrot');
+
+        // 音效函数
+        function playSound(type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            if (type === 'correct') {
+                // 正确音效 - 愉快的音调
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+                oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } else if (type === 'incorrect') {
+                // 错误音效 - 低沉的音调
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(220, audioContext.currentTime); // A3
+                oscillator.frequency.setValueAtTime(196, audioContext.currentTime + 0.1); // G3
+                oscillator.frequency.setValueAtTime(174.61, audioContext.currentTime + 0.2); // F3
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } else if (type === 'monsterHit') {
+                // 怪物到达萝卜音效
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(110, audioContext.currentTime); // A2
+                oscillator.frequency.exponentialRampToValueAtTime(55, audioContext.currentTime + 0.5); // A1
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } else if (type === 'explosion') {
+                // 爆炸音效
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(100, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.3);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            }
+        }
+
+        // 初始化游戏
+        function initGame() {
+            updateDisplay();
+            createMonsters();
+            
+            startBtn.addEventListener('click', startGame);
+            nextLevelBtn.addEventListener('click', nextLevel);
+        }
+
+        // 开始游戏
+        function startGame() {
+            if (gameState.isPlaying) return;
+            
+            gameState.isPlaying = true;
+            startBtn.disabled = true;
+            nextLevelBtn.disabled = true;
+            
+            // 移动怪物
+            gameState.monsters.forEach((monster, index) => {
+                setTimeout(() => {
+                    moveMonster(monster);
+                }, index * 2000);
+            });
+        }
+
+        // 创建怪物 - 改进的设计
+        function createMonsters() {
+            // 清除之前的怪物
+            const existingMonsters = document.querySelectorAll('.monster');
+            existingMonsters.forEach(monster => monster.remove());
+            
+            gameState.monsters = [];
+            gameState.currentWords = [];
+            
+            // 为当前关卡选择单词
+            const wordCount = Math.min(8 + gameState.currentLevel, wordDatabase.length);
+            const selectedWords = [];
+            
+            while(selectedWords.length < wordCount) {
+                const randomIndex = Math.floor(Math.random() * wordDatabase.length);
+                const word = wordDatabase[randomIndex];
+                
+                if (!selectedWords.some(w => w.english === word.english)) {
+                    selectedWords.push(word);
+                    gameState.currentWords.push(word);
+                }
+            }
+            
+            // 创建怪物元素 - 改进的设计
+            for (let i = 0; i < wordCount; i++) {
+                const monster = document.createElement('div');
+                monster.className = 'monster';
+                monster.style.left = `${-100 - i * 40}px`;
+                monster.style.bottom = '20px';
+                
+                // 创建怪物单词标签
+                const wordElement = document.createElement('div');
+                wordElement.className = 'monster-word';
+                wordElement.textContent = selectedWords[i].english;
+                
+                // 创建怪物身体
+                const bodyElement = document.createElement('div');
+                bodyElement.className = 'monster-body';
+                bodyElement.style.background = getRandomMonsterColor();
+                
+                // 创建怪物特征
+                const featuresElement = document.createElement('div');
+                featuresElement.className = 'monster-features';
+                
+                // 添加眼睛
+                const leftEye = document.createElement('div');
+                leftEye.className = 'monster-eye left';
+                const leftPupil = document.createElement('div');
+                leftPupil.className = 'monster-pupil';
+                leftEye.appendChild(leftPupil);
+                
+                const rightEye = document.createElement('div');
+                rightEye.className = 'monster-eye right';
+                const rightPupil = document.createElement('div');
+                rightPupil.className = 'monster-pupil';
+                rightEye.appendChild(rightPupil);
+                
+                // 添加嘴巴
+                const mouth = document.createElement('div');
+                mouth.className = 'monster-mouth';
+                
+                featuresElement.appendChild(leftEye);
+                featuresElement.appendChild(rightEye);
+                featuresElement.appendChild(mouth);
+                
+                bodyElement.appendChild(featuresElement);
+                
+                monster.appendChild(wordElement);
+                monster.appendChild(bodyElement);
+                
+                // 添加点击事件
+                monster.addEventListener('click', () => selectMonster(monster, selectedWords[i]));
+                
+                gameBoard.appendChild(monster);
+                gameState.monsters.push(monster);
+            }
+            
+            gameState.remainingMonsters = wordCount;
+            updateDisplay();
+        }
+
+        // 移动怪物 - 降低移动速度
+        function moveMonster(monster) {
+            if (!gameState.isPlaying) return;
+            
+            let position = parseInt(monster.style.left);
+            const interval = setInterval(() => {
+                if (!gameState.isPlaying) {
+                    clearInterval(interval);
+                    return;
+                }
+                
+                position += 1; // 降低移动速度
+                monster.style.left = `${position}px`;
+                
+                // 检查是否到达萝卜
+                if (position > gameBoard.offsetWidth - 180) {
+                    clearInterval(interval);
+                    monsterReachedCarrot(monster);
+                }
+            }, 80); // 增加间隔时间，使移动更慢
+        }
+
+        // 怪物到达萝卜
+        function monsterReachedCarrot(monster) {
+            gameState.lives--;
+            updateDisplay();
+            
+            // 添加动画效果
+            monster.classList.add('eliminated');
+            carrot.classList.add('hurt');
+            playSound('monsterHit');
+            
+            setTimeout(() => {
+                carrot.classList.remove('hurt');
+            }, 500);
+            
+            if (gameState.lives <= 0) {
+                gameOver();
+            }
+        }
+
+        // 选择怪物
+        function selectMonster(monster, word) {
+            if (!gameState.isPlaying || gameState.selectedMonster === monster) return;
+            
+            // 重置之前选中的怪物
+            if (gameState.selectedMonster) {
+                gameState.selectedMonster.classList.remove('selected');
+            }
+            
+            // 设置当前选中的怪物
+            gameState.selectedMonster = monster;
+            monster.classList.add('selected');
+            
+            // 显示当前单词
+            currentWordDisplay.textContent = word.english;
+            
+            // 生成选项
+            generateOptions(word);
+        }
+
+        // 生成选项
+        function generateOptions(correctWord) {
+            optionsContainer.innerHTML = '';
+            
+            // 创建选项数组，包含正确答案
+            const options = [correctWord.chinese];
+            
+            // 添加错误选项
+            while (options.length < 4) {
+                const randomIndex = Math.floor(Math.random() * wordDatabase.length);
+                const randomChinese = wordDatabase[randomIndex].chinese;
+                
+                if (!options.includes(randomChinese) && randomChinese !== correctWord.chinese) {
+                    options.push(randomChinese);
+                }
+            }
+            
+            // 随机排序选项
+            options.sort(() => Math.random() - 0.5);
+            
+            // 创建选项元素
+            options.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                
+                optionElement.addEventListener('click', () => checkAnswer(option, correctWord.chinese));
+                
+                optionsContainer.appendChild(optionElement);
+            });
+        }
+
+        // 检查答案
+        function checkAnswer(selectedAnswer, correctAnswer) {
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                option.style.pointerEvents = 'none'; // 禁用进一步点击
+                
+                if (option.textContent === correctAnswer) {
+                    option.classList.add('correct');
+                } else if (option.textContent === selectedAnswer && selectedAnswer !== correctAnswer) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedAnswer === correctAnswer) {
+                // 正确答案
+                playSound('correct');
+                gameState.score += 10 * gameState.currentLevel;
+                eliminateMonster();
+            } else {
+                // 错误答案
+                playSound('incorrect');
+                gameState.lives--;
+                updateDisplay();
+                
+                if (gameState.lives <= 0) {
+                    gameOver();
+                }
+            }
+            
+            // 重置选择
+            setTimeout(() => {
+                if (gameState.selectedMonster) {
+                    gameState.selectedMonster.classList.remove('selected');
+                    gameState.selectedMonster = null;
+                }
+                currentWordDisplay.textContent = "选择一个怪物继续游戏";
+                optionsContainer.innerHTML = '';
+            }, 1500);
+        }
+
+        // 消灭怪物
+        function eliminateMonster() {
+            if (gameState.selectedMonster) {
+                // 创建爆炸效果
+                const explosion = document.createElement('div');
+                explosion.className = 'explosion';
+                explosion.style.left = gameState.selectedMonster.style.left;
+                explosion.style.bottom = gameState.selectedMonster.style.bottom;
+                gameBoard.appendChild(explosion);
+                
+                // 显示得分动画
+                const scorePopup = document.createElement('div');
+                scorePopup.className = 'score-popup';
+                scorePopup.textContent = `+${10 * gameState.currentLevel}`;
+                scorePopup.style.left = gameState.selectedMonster.style.left;
+                scorePopup.style.bottom = gameState.selectedMonster.style.bottom;
+                gameBoard.appendChild(scorePopup);
+                
+                // 播放爆炸音效
+                playSound('explosion');
+                
+                // 移除怪物
+                gameState.selectedMonster.classList.add('eliminated');
+                gameState.remainingMonsters--;
+                updateDisplay();
+                
+                // 移除爆炸效果和得分动画
+                setTimeout(() => {
+                    explosion.remove();
+                    scorePopup.remove();
+                }, 600);
+                
+                // 检查是否所有怪物都被消灭
+                if (gameState.remainingMonsters <= 0) {
+                    levelComplete();
+                }
+            }
+        }
+
+        // 关卡完成
+        function levelComplete() {
+            gameState.isPlaying = false;
+            
+            setTimeout(() => {
+                if (gameState.currentLevel < 5) {
+                    nextLevelBtn.disabled = false;
+                    alert(`恭喜！你完成了第${gameState.currentLevel}关！得分：${gameState.score}`);
+                } else {
+                    gameWin();
+                }
+            }, 1000);
+        }
+
+        // 下一关
+        function nextLevel() {
+            gameState.currentLevel++;
+            gameState.isPlaying = false;
+            startBtn.disabled = false;
+            nextLevelBtn.disabled = true;
+            
+            createMonsters();
+            updateDisplay();
+        }
+
+        // 游戏胜利
+        function gameWin() {
+            gameState.isPlaying = false;
+            
+            const gameOverScreen = document.createElement('div');
+            gameOverScreen.className = 'game-over';
+            gameOverScreen.innerHTML = `
+                <h2>恭喜！</h2>
+                <p>你成功保卫了萝卜！</p>
+                <p>最终得分: ${gameState.score}</p>
+                <button class="btn" onclick="restartGame()">再玩一次</button>
+            `;
+            
+            gameBoard.appendChild(gameOverScreen);
+        }
+
+        // 游戏结束
+        function gameOver() {
+            gameState.isPlaying = false;
+            
+            const gameOverScreen = document.createElement('div');
+            gameOverScreen.className = 'game-over';
+            gameOverScreen.innerHTML = `
+                <h2>游戏结束</h2>
+                <p>萝卜被吃掉了！</p>
+                <p>最终得分: ${gameState.score}</p>
+                <button class="btn" onclick="restartGame()">再玩一次</button>
+            `;
+            
+            gameBoard.appendChild(gameOverScreen);
+        }
+
+        // 重新开始游戏
+        function restartGame() {
+            gameState.currentLevel = 1;
+            gameState.score = 0;
+            gameState.lives = 5;
+            gameState.isPlaying = false;
+            gameState.selectedMonster = null;
+            
+            const gameOverScreen = document.querySelector('.game-over');
+            if (gameOverScreen) {
+                gameOverScreen.remove();
+            }
+            
+            startBtn.disabled = false;
+            nextLevelBtn.disabled = true;
+            
+            createMonsters();
+            updateDisplay();
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            levelDisplay.textContent = gameState.currentLevel;
+            scoreDisplay.textContent = gameState.score;
+            livesDisplay.textContent = gameState.lives;
+            remainingDisplay.textContent = gameState.remainingMonsters;
+            currentLevelDisplay.textContent = gameState.currentLevel;
+        }
+
+        // 获取随机怪物颜色
+        function getRandomMonsterColor() {
+            const colors = [
+                'linear-gradient(135deg, #FF5252, #FF1744)',
+                'linear-gradient(135deg, #448AFF, #2979FF)',
+                'linear-gradient(135deg, #69F0AE, #00E676)',
+                'linear-gradient(135deg, #FFD740, #FFC400)',
+                'linear-gradient(135deg, #E040FB, #D500F9)',
+                'linear-gradient(135deg, #18FFFF, #00E5FF)'
+            ];
+            
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // 初始化游戏
+        window.onload = initGame;
+        window.restartGame = restartGame;
+    </script>
+</body>
+</html>

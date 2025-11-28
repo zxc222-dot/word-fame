@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>女巫的魔药 - 单词匹配游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a0529, #2d0b42);
+            color: #e6d4ff;
+            min-height: 100vh;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            color: #c77dff;
+            text-shadow: 0 0 10px #9d4edd;
+            margin-bottom: 10px;
+        }
+        
+        .compact-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .game-info, .import-section {
+            background-color: rgba(41, 13, 65, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #7b2cbf;
+            box-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+        }
+        
+        .game-info h2, .import-section h2 {
+            color: #e0aaff;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        
+        .game-info ul {
+            list-style-type: none;
+            padding-left: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .game-info li {
+            margin-bottom: 5px;
+            padding-left: 15px;
+            position: relative;
+        }
+        
+        .game-info li:before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+        }
+        
+        .import-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        textarea {
+            background-color: rgba(25, 8, 40, 0.9);
+            border: 2px solid #7b2cbf;
+            border-radius: 8px;
+            color: #e6d4ff;
+            padding: 10px;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 80px;
+            max-height: 100px;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #c77dff;
+            box-shadow: 0 0 8px rgba(157, 78, 221, 0.7);
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #7b2cbf;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: rgba(25, 8, 40, 0.5);
+        }
+        
+        .file-upload-area:hover, .file-upload-area.dragover {
+            background-color: rgba(123, 44, 191, 0.2);
+            border-color: #c77dff;
+        }
+        
+        .file-upload-area p {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .file-upload-area .hint {
+            font-size: 0.8rem;
+            color: #c77dff;
+        }
+        
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .witch-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .witch {
+            width: 120px;
+            height: 180px;
+            background: linear-gradient(to bottom, #3c096c, #240046);
+            border-radius: 50% 50% 40% 40%;
+            position: relative;
+            margin-bottom: 10px;
+            box-shadow: 0 0 15px rgba(157, 78, 221, 0.7);
+        }
+        
+        .witch-hat {
+            width: 90px;
+            height: 60px;
+            background-color: #10002b;
+            position: absolute;
+            top: -40px;
+            left: 15px;
+            border-radius: 50% 50% 0 0;
+            clip-path: polygon(0% 100%, 25% 0%, 75% 0%, 100% 100%);
+        }
+        
+        .witch-hat:after {
+            content: "";
+            position: absolute;
+            width: 110px;
+            height: 15px;
+            background-color: #10002b;
+            bottom: 0;
+            left: -10px;
+            border-radius: 8px;
+        }
+        
+        .witch-face {
+            width: 70px;
+            height: 85px;
+            background-color: #ffddc1;
+            border-radius: 40%;
+            position: absolute;
+            top: 35px;
+            left: 25px;
+        }
+        
+        .witch-eye {
+            width: 12px;
+            height: 18px;
+            background-color: #10002b;
+            border-radius: 50%;
+            position: absolute;
+            top: 30px;
+        }
+        
+        .witch-eye.left {
+            left: 18px;
+        }
+        
+        .witch-eye.right {
+            right: 18px;
+        }
+        
+        .witch-mouth {
+            width: 25px;
+            height: 6px;
+            background-color: #e63946;
+            border-radius: 0 0 15px 15px;
+            position: absolute;
+            bottom: 25px;
+            left: 22px;
+        }
+        
+        .cauldron {
+            width: 90px;
+            height: 50px;
+            background-color: #10002b;
+            border-radius: 50%;
+            position: relative;
+            margin-top: 10px;
+        }
+        
+        .cauldron:before {
+            content: "";
+            position: absolute;
+            width: 70px;
+            height: 35px;
+            background: linear-gradient(to bottom, #3c096c, #240046);
+            border-radius: 50%;
+            top: -18px;
+            left: 10px;
+        }
+        
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: -25px;
+        }
+        
+        .bubble {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #9d4edd;
+            border-radius: 50%;
+            animation: bubble-float 3s infinite ease-in-out;
+            opacity: 0.7;
+        }
+        
+        .bubble:nth-child(1) {
+            left: 15px;
+            animation-delay: 0s;
+        }
+        
+        .bubble:nth-child(2) {
+            left: 40px;
+            animation-delay: 0.5s;
+        }
+        
+        .bubble:nth-child(3) {
+            left: 65px;
+            animation-delay: 1s;
+        }
+        
+        @keyframes bubble-float {
+            0% { transform: translateY(0); opacity: 0.7; }
+            50% { transform: translateY(-15px); opacity: 1; }
+            100% { transform: translateY(-30px); opacity: 0; }
+        }
+        
+        .cards-section {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .english-cards, .chinese-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .card {
+            background: linear-gradient(145deg, #3c096c, #240046);
+            height: 70px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            padding: 5px;
+            user-select: none;
+            border: 2px solid #5a189a;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(157, 78, 221, 0.5);
+            border-color: #9d4edd;
+        }
+        
+        .card.matched {
+            background: linear-gradient(145deg, #1e3a8a, #3730a3);
+            border-color: #4f46e5;
+            color: #c7d2fe;
+            cursor: default;
+        }
+        
+        .card.poison {
+            background: linear-gradient(145deg, #831843, #500724);
+            border-color: #be123c;
+            color: #fecdd3;
+        }
+        
+        .card.error {
+            background: linear-gradient(145deg, #7c2d12, #431407);
+            border-color: #ea580c;
+            color: #fed7aa;
+        }
+        
+        .card.dragging {
+            opacity: 0.7;
+            transform: scale(1.03);
+        }
+        
+        .drop-zone {
+            min-height: 70px;
+            border: 2px dashed #7b2cbf;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .drop-zone.active {
+            background-color: rgba(123, 44, 191, 0.2);
+            border-color: #c77dff;
+        }
+        
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        button {
+            background: linear-gradient(to right, #7b2cbf, #9d4edd);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(123, 44, 191, 0.5);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(123, 44, 191, 0.7);
+        }
+        
+        .game-status {
+            text-align: center;
+            margin: 10px 0;
+            min-height: 40px;
+            font-size: 1.1rem;
+            color: #e0aaff;
+            text-shadow: 0 0 5px rgba(157, 78, 221, 0.7);
+        }
+        
+        .score {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: #c77dff;
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            color: #e0aaff;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .import-btn {
+            background: linear-gradient(to right, #7b2cbf, #9d4edd);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(123, 44, 191, 0.5);
+            align-self: flex-start;
+            margin-top: 5px;
+        }
+        
+        .import-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(123, 44, 191, 0.7);
+        }
+        
+        .audio-controls {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background-color: rgba(41, 13, 65, 0.8);
+            padding: 5px 10px;
+            border-radius: 20px;
+            border: 1px solid #7b2cbf;
+        }
+        
+        .audio-controls button {
+            background: none;
+            border: none;
+            color: #e0aaff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 毒药提示区域样式 */
+        .poison-hint {
+            background-color: rgba(123, 44, 191, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center;
+            border: 1px solid #9d4edd;
+        }
+        
+        .poison-hint h3 {
+            color: #e0aaff;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+        
+        .poison-hint .hint-text {
+            font-size: 1rem;
+            color: #c77dff;
+            text-shadow: 0 0 3px rgba(157, 78, 221, 0.5);
+            min-height: 20px;
+        }
+        
+        .hint-badge {
+            display: inline-block;
+            background-color: #7b2cbf;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+        
+        @media (max-width: 900px) {
+            .compact-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .witch-section {
+                flex-direction: row;
+                justify-content: space-around;
+            }
+            
+            .witch {
+                margin-bottom: 0;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .english-cards, .chinese-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>女巫的魔药</h1>
+        </header>
+        
+        <div class="compact-section">
+            <div class="game-info">
+                <h2>游戏说明</h2>
+                <ul>
+                    <li>系统会随机选择1个单词作为毒药</li>
+                    <li>将下方中文卡片拖到对应的英文卡片上</li>
+                    <li>匹配正确，卡片会变为蓝色</li>
+                    <li>匹配错误或拖到毒药卡片时，游戏结束</li>
+                    <li>成功避开毒药并匹配全部卡片即可获胜</li>
+                    <li>每答对一个单词，可获得毒药单词的一个提示</li>
+                    <li>每轮随机显示8个单词</li>
+                </ul>
+            </div>
+            
+            <div class="import-section">
+                <h2>导入单词</h2>
+                <div class="import-controls">
+                    <textarea id="word-input" placeholder="请输入单词对，格式：英文:中文（每行一对）&#10;例如：&#10;Magic:魔法&#10;Witch:女巫&#10;Potion:魔药"></textarea>
+                    <button id="import-btn" class="import-btn">导入单词</button>
+                    
+                    <div class="file-upload-area" id="file-upload-area">
+                        <p>拖放文件到这里上传</p>
+                        <p class="hint">支持.txt或.csv文件，格式：英文:中文</p>
+                    </div>
+                    <input type="file" id="file-input" accept=".txt,.csv" style="display: none;">
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-area">
+            <div class="witch-section">
+                <div class="witch">
+                    <div class="witch-hat"></div>
+                    <div class="witch-face">
+                        <div class="witch-eye left"></div>
+                        <div class="witch-eye right"></div>
+                        <div class="witch-mouth"></div>
+                    </div>
+                </div>
+                <div class="cauldron">
+                    <div class="bubbles">
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cards-section">
+                <div class="score">已匹配: <span id="matched-count">0</span> / 8 | 毒药状态: <span id="poison-status">未触发</span></div>
+                <div class="game-status" id="game-status">将中文卡片拖到对应的英文卡片上，但要小心毒药！</div>
+                
+                <!-- 毒药提示区域 -->
+                <div class="poison-hint">
+                    <h3>毒药提示 <span class="hint-badge" id="hint-counter">0/3</span></h3>
+                    <div class="hint-text" id="poison-hint">每答对一个单词，将获得关于毒药的线索</div>
+                </div>
+                
+                <div class="section-title">英文单词</div>
+                <div class="english-cards" id="english-cards">
+                    <!-- 英文卡片将通过JavaScript动态生成 -->
+                </div>
+                
+                <div class="section-title">中文释义</div>
+                <div class="chinese-cards" id="chinese-cards">
+                    <!-- 中文卡片将通过JavaScript动态生成 -->
+                </div>
+                
+                <div class="game-controls">
+                    <button id="start-btn">开始游戏</button>
+                    <button id="reset-btn">重新开始</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 音频控制 -->
+    <div class="audio-controls">
+        <button id="bgm-toggle">🔊</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 默认单词库 - 英文和中文对应
+            const defaultWordPairs = [
+                { en: "Magic", cn: "魔法" },
+                { en: "Potion", cn: "魔药" },
+                { en: "Witch", cn: "女巫" },
+                { en: "Broom", cn: "扫帚" },
+                { en: "Cat", cn: "黑猫" },
+                { en: "Moon", cn: "月亮" },
+                { en: "Star", cn: "星星" },
+                { en: "Spell", cn: "咒语" },
+                { en: "Crystal", cn: "水晶" },
+                { en: "Tarot", cn: "塔罗" },
+                { en: "Prophet", cn: "预言" },
+                { en: "Ghost", cn: "幽灵" },
+                { en: "Vampire", cn: "吸血鬼" },
+                { en: "Werewolf", cn: "狼人" },
+                { en: "Zombie", cn: "僵尸" },
+                { en: "Elf", cn: "精灵" }
+            ];
+            
+            let wordPairs = [...defaultWordPairs];
+            
+            const englishCardsContainer = document.getElementById('english-cards');
+            const chineseCardsContainer = document.getElementById('chinese-cards');
+            const startBtn = document.getElementById('start-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const gameStatus = document.getElementById('game-status');
+            const matchedCountEl = document.getElementById('matched-count');
+            const poisonStatusEl = document.getElementById('poison-status');
+            const wordInput = document.getElementById('word-input');
+            const importBtn = document.getElementById('import-btn');
+            const fileUploadArea = document.getElementById('file-upload-area');
+            const fileInput = document.getElementById('file-input');
+            const bgmToggle = document.getElementById('bgm-toggle');
+            const poisonHintEl = document.getElementById('poison-hint');
+            const hintCounterEl = document.getElementById('hint-counter');
+            
+            let gameWords = [];
+            let poisonWord = "";
+            let matchedCount = 0;
+            let gameActive = false;
+            let bgmPlaying = false;
+            let bgmAudioContext = null;
+            let bgmOscillator = null;
+            let bgmGainNode = null;
+            let hintsGiven = 0;
+            const maxHints = 3;
+            
+            // 提示类型
+            const hintTypes = [
+                // 长度提示
+                (word) => `这个毒药单词有 ${word.length} 个字母`,
+                
+                // 首字母提示
+                (word) => `这个毒药单词以 "${word.charAt(0)}" 开头`,
+                
+                // 尾字母提示
+                (word) => `这个毒药单词以 "${word.charAt(word.length - 1)}" 结尾`,
+                
+                // 类别提示
+                (word) => {
+                    const categories = {
+                        "Magic": "魔法相关",
+                        "Potion": "魔药相关", 
+                        "Witch": "女巫相关",
+                        "Broom": "飞行工具",
+                        "Cat": "动物",
+                        "Moon": "天体",
+                        "Star": "天体",
+                        "Spell": "咒语",
+                        "Crystal": "矿物",
+                        "Tarot": "占卜",
+                        "Prophet": "预言",
+                        "Ghost": "超自然生物",
+                        "Vampire": "超自然生物",
+                        "Werewolf": "超自然生物",
+                        "Zombie": "超自然生物",
+                        "Elf": "神话生物"
+                    };
+                    return categories[word] || "神秘物品";
+                },
+                
+                // 字母数提示
+                (word) => {
+                    const vowels = word.match(/[aeiou]/gi);
+                    return `这个毒药单词有 ${vowels ? vowels.length : 0} 个元音字母`;
+                },
+                
+                // 模糊描述
+                (word) => {
+                    const descriptions = {
+                        "Magic": "一种强大的超自然力量",
+                        "Potion": "一种混合液体，具有特殊效果",
+                        "Witch": "一位掌握神秘力量的女性",
+                        "Broom": "一种常见的清洁工具，也可用于飞行",
+                        "Cat": "一种常见的宠物，常与魔法相关联",
+                        "Moon": "夜晚天空中最亮的天体",
+                        "Star": "夜空中闪烁的光点",
+                        "Spell": "一种具有魔力的咒语",
+                        "Crystal": "一种透明或有色的矿物",
+                        "Tarot": "一种用于占卜的卡片",
+                        "Prophet": "能够预见未来的人",
+                        "Ghost": "死者的灵魂",
+                        "Vampire": "一种以血液为食的不死生物",
+                        "Werewolf": "月圆之夜变身为狼的人",
+                        "Zombie": "一种复活的不死生物",
+                        "Elf": "一种长耳朵的神话生物"
+                    };
+                    return descriptions[word] || "一种神秘的事物";
+                }
+            ];
+            
+            // 初始化游戏
+            function initGame() {
+                // 清空卡片容器
+                englishCardsContainer.innerHTML = '';
+                chineseCardsContainer.innerHTML = '';
+                
+                // 重置游戏状态
+                matchedCount = 0;
+                gameActive = true;
+                hintsGiven = 0;
+                
+                // 更新状态显示
+                matchedCountEl.textContent = matchedCount;
+                poisonStatusEl.textContent = "未触发";
+                gameStatus.textContent = "将中文卡片拖到对应的英文卡片上，但要小心毒药！";
+                gameStatus.style.color = "#e0aaff";
+                poisonHintEl.textContent = "每答对一个单词，将获得关于毒药的线索";
+                hintCounterEl.textContent = `0/${maxHints}`;
+                
+                // 从单词库中随机选择8个单词
+                gameWords = [...wordPairs]
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 8);
+                
+                // 随机选择一个单词作为毒药
+                const poisonPair = gameWords[Math.floor(Math.random() * gameWords.length)];
+                poisonWord = poisonPair.en;
+                
+                // 创建英文卡片
+                gameWords.forEach(pair => {
+                    const card = document.createElement('div');
+                    card.className = 'card drop-zone';
+                    card.textContent = pair.en;
+                    card.dataset.word = pair.en;
+                    card.dataset.type = 'english';
+                    
+                    // 如果是毒药卡片，添加特殊标记
+                    if (pair.en === poisonWord) {
+                        card.dataset.poison = 'true';
+                    }
+                    
+                    englishCardsContainer.appendChild(card);
+                });
+                
+                // 创建中文卡片（打乱顺序）
+                const shuffledChinese = [...gameWords]
+                    .sort(() => 0.5 - Math.random());
+                
+                shuffledChinese.forEach(pair => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.textContent = pair.cn;
+                    card.dataset.word = pair.en; // 存储对应的英文单词
+                    card.dataset.type = 'chinese';
+                    card.draggable = true;
+                    
+                    // 如果是毒药卡片，添加特殊标记
+                    if (pair.en === poisonWord) {
+                        card.dataset.poison = 'true';
+                    }
+                    
+                    // 添加拖拽事件
+                    card.addEventListener('dragstart', handleDragStart);
+                    card.addEventListener('dragend', handleDragEnd);
+                    
+                    chineseCardsContainer.appendChild(card);
+                });
+                
+                // 添加放置区域事件
+                document.querySelectorAll('.drop-zone').forEach(zone => {
+                    zone.addEventListener('dragover', handleDragOver);
+                    zone.addEventListener('dragenter', handleDragEnter);
+                    zone.addEventListener('dragleave', handleDragLeave);
+                    zone.addEventListener('drop', handleDrop);
+                });
+            }
+            
+            // 获取毒药提示
+            function getPoisonHint() {
+                if (hintsGiven >= maxHints) {
+                    return "你已经获得了所有提示，小心选择！";
+                }
+                
+                // 随机选择一种提示类型
+                const hintIndex = Math.floor(Math.random() * hintTypes.length);
+                const hintFunction = hintTypes[hintIndex];
+                
+                hintsGiven++;
+                hintCounterEl.textContent = `${hintsGiven}/${maxHints}`;
+                
+                return hintFunction(poisonWord);
+            }
+            
+            // 拖拽处理函数
+            function handleDragStart(e) {
+                if (!gameActive) {
+                    e.preventDefault();
+                    return;
+                }
+                
+                this.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', this.dataset.word);
+                e.dataTransfer.setData('text/poison', this.dataset.poison || 'false');
+            }
+            
+            function handleDragEnd() {
+                this.classList.remove('dragging');
+            }
+            
+            function handleDragOver(e) {
+                e.preventDefault();
+            }
+            
+            function handleDragEnter(e) {
+                e.preventDefault();
+                this.classList.add('active');
+            }
+            
+            function handleDragLeave() {
+                this.classList.remove('active');
+            }
+            
+            function handleDrop(e) {
+                e.preventDefault();
+                this.classList.remove('active');
+                
+                if (!gameActive) return;
+                
+                const draggedWord = e.dataTransfer.getData('text/plain');
+                const isPoison = e.dataTransfer.getData('text/poison') === 'true';
+                const targetWord = this.dataset.word;
+                
+                // 检查是否是毒药
+                if (isPoison) {
+                    // 播放错误音效
+                    playSound('lose');
+                    
+                    // 显示毒药卡片
+                    document.querySelectorAll(`[data-word="${draggedWord}"]`).forEach(card => {
+                        card.classList.add('poison');
+                    });
+                    
+                    gameActive = false;
+                    gameStatus.textContent = "啊！你触碰了禁忌的毒药！黑暗吞噬了你的灵魂...";
+                    gameStatus.style.color = "#f87171";
+                    poisonStatusEl.textContent = "已触发";
+                    
+                    // 显示毒药单词
+                    poisonHintEl.textContent = `毒药单词是: ${poisonWord}`;
+                    return;
+                }
+                
+                // 检查是否匹配
+                if (draggedWord === targetWord) {
+                    // 匹配正确
+                    playSound('correct');
+                    
+                    // 标记为已匹配
+                    this.classList.add('matched');
+                    document.querySelectorAll(`[data-word="${draggedWord}"]`).forEach(card => {
+                        card.classList.add('matched');
+                        card.draggable = false;
+                    });
+                    
+                    matchedCount++;
+                    matchedCountEl.textContent = matchedCount;
+                    
+                    // 更新毒药提示
+                    poisonHintEl.textContent = getPoisonHint();
+                    
+                    // 检查是否获胜
+                    if (matchedCount === gameWords.length) {
+                        playSound('win');
+                        gameActive = false;
+                        gameStatus.textContent = "恭喜！你成功驾驭了所有魔药的力量，成为了真正的魔法大师！";
+                        gameStatus.style.color = "#4ade80";
+                    }
+                } else {
+                    // 匹配错误
+                    playSound('wrong');
+                    
+                    // 标记错误的卡片
+                    this.classList.add('error');
+                    document.querySelectorAll(`[data-word="${draggedWord}"]`).forEach(card => {
+                        card.classList.add('error');
+                    });
+                    
+                    gameActive = false;
+                    gameStatus.textContent = "错误的组合！魔法反噬了你的力量，你已迷失在咒语之中...";
+                    gameStatus.style.color = "#fb923c";
+                }
+            }
+            
+            // 播放音效
+            function playSound(type) {
+                // 创建音频上下文
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // 创建振荡器
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // 设置音效类型
+                switch(type) {
+                    case 'correct':
+                        oscillator.type = 'sine';
+                        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 0.3);
+                        break;
+                    case 'wrong':
+                        oscillator.type = 'sawtooth';
+                        oscillator.frequency.setValueAtTime(110, audioContext.currentTime); // A2
+                        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.7);
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 0.7);
+                        break;
+                    case 'win':
+                        // 胜利音效 - 上升音阶
+                        oscillator.type = 'sine';
+                        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+                        oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+                        oscillator.frequency.setValueAtTime(1046.50, audioContext.currentTime + 0.3); // C6
+                        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.6);
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 0.6);
+                        break;
+                    case 'lose':
+                        // 失败音效 - 下降音阶
+                        oscillator.type = 'sawtooth';
+                        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                        oscillator.frequency.setValueAtTime(392.00, audioContext.currentTime + 0.2); // G4
+                        oscillator.frequency.setValueAtTime(261.63, audioContext.currentTime + 0.4); // C4
+                        oscillator.frequency.setValueAtTime(130.81, audioContext.currentTime + 0.6); // C3
+                        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 0.8);
+                        break;
+                }
+            }
+            
+            // 播放背景音乐
+            function playBGM() {
+                if (!bgmAudioContext) {
+                    bgmAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                if (!bgmOscillator) {
+                    bgmOscillator = bgmAudioContext.createOscillator();
+                    bgmGainNode = bgmAudioContext.createGain();
+                    
+                    bgmOscillator.connect(bgmGainNode);
+                    bgmGainNode.connect(bgmAudioContext.destination);
+                    
+                    bgmOscillator.type = 'sine';
+                    bgmOscillator.frequency.setValueAtTime(220, bgmAudioContext.currentTime); // A3
+                    bgmGainNode.gain.setValueAtTime(0.05, bgmAudioContext.currentTime);
+                    
+                    bgmOscillator.start();
+                    bgmPlaying = true;
+                    bgmToggle.textContent = "🔊";
+                }
+            }
+            
+            // 停止背景音乐
+            function stopBGM() {
+                if (bgmOscillator) {
+                    bgmOscillator.stop();
+                    bgmOscillator = null;
+                    bgmGainNode = null;
+                    bgmPlaying = false;
+                    bgmToggle.textContent = "🔇";
+                }
+            }
+            
+            // 导入单词
+            function importWords() {
+                const input = wordInput.value.trim();
+                if (!input) {
+                    alert('请输入单词对！');
+                    return;
+                }
+                
+                const lines = input.split('\n');
+                const newWordPairs = [];
+                
+                for (let line of lines) {
+                    line = line.trim();
+                    if (!line) continue;
+                    
+                    const parts = line.split(':');
+                    if (parts.length !== 2) {
+                        alert(`格式错误: "${line}"。请使用"英文:中文"格式。`);
+                        return;
+                    }
+                    
+                    const en = parts[0].trim();
+                    const cn = parts[1].trim();
+                    
+                    if (!en || !cn) {
+                        alert(`格式错误: "${line}"。英文和中文都不能为空。`);
+                        return;
+                    }
+                    
+                    newWordPairs.push({ en, cn });
+                }
+                
+                if (newWordPairs.length < 8) {
+                    alert(`至少需要8个单词对，当前只有${newWordPairs.length}个。`);
+                    return;
+                }
+                
+                wordPairs = newWordPairs;
+                alert(`成功导入${wordPairs.length}个单词对！`);
+                
+                // 重置游戏状态
+                gameActive = false;
+                gameStatus.textContent = "单词已导入，点击开始游戏！";
+                englishCardsContainer.innerHTML = '';
+                chineseCardsContainer.innerHTML = '';
+                matchedCountEl.textContent = '0';
+                poisonStatusEl.textContent = '未触发';
+                poisonHintEl.textContent = "每答对一个单词，将获得关于毒药的线索";
+                hintCounterEl.textContent = `0/${maxHints}`;
+            }
+            
+            // 处理文件上传
+            function handleFileUpload(file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    wordInput.value = content;
+                    importWords();
+                };
+                
+                reader.readAsText(file);
+            }
+            
+            // 事件监听
+            startBtn.addEventListener('click', initGame);
+            resetBtn.addEventListener('click', initGame);
+            importBtn.addEventListener('click', importWords);
+            
+            // 文件上传事件
+            fileUploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFileUpload(e.target.files[0]);
+                }
+            });
+            
+            // 拖放文件事件
+            fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.add('dragover');
+            });
+            
+            fileUploadArea.addEventListener('dragleave', () => {
+                fileUploadArea.classList.remove('dragover');
+            });
+            
+            fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.remove('dragover');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    handleFileUpload(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // 背景音乐控制
+            bgmToggle.addEventListener('click', () => {
+                if (bgmPlaying) {
+                    stopBGM();
+                } else {
+                    playBGM();
+                }
+            });
+            
+            // 初始加载时显示默认单词
+            wordInput.value = defaultWordPairs.map(pair => `${pair.en}:${pair.cn}`).join('\n');
+            
+            // 自动播放背景音乐
+            playBGM();
+        });
+    </script>
+</body>
+</html>
