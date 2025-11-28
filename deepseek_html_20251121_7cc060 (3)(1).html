@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词学习游戏中心</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --pink: #FFD1DC;
+            --blue: #B5EAD7;
+            --yellow: #FFEAA7;
+            --purple: #D8BFD8;
+            --green: #C7EEEA;
+            --text: #5A5A5A;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #FF6B8B;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .daily-motivation {
+            background: var(--yellow);
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 2px dashed #FFC145;
+        }
+        
+        .checkin-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        
+        .checkin-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #5A5A5A;
+        }
+        
+        .checkin-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .checkin-day {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 2px solid transparent;
+        }
+        
+        .checkin-day:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .checkin-day.checked {
+            background: var(--green);
+            border-color: #4CAF50;
+        }
+        
+        .day-label {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #777;
+        }
+        
+        .day-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .game-card.completed::after {
+            content: "✓";
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #4CAF50;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .game-card:nth-child(1) .game-icon {
+            background: var(--pink);
+            color: #FF6B8B;
+        }
+        
+        .game-card:nth-child(2) .game-icon {
+            background: var(--blue);
+            color: #3D9970;
+        }
+        
+        .game-card:nth-child(3) .game-icon {
+            background: var(--yellow);
+            color: #FFA500;
+        }
+        
+        .game-card:nth-child(4) .game-icon {
+            background: var(--purple);
+            color: #8A2BE2;
+        }
+        
+        .game-card:nth-child(5) .game-icon {
+            background: var(--green);
+            color: #20B2AA;
+        }
+        
+        .game-card:nth-child(6) .game-icon {
+            background: #FFA07A;
+            color: #FF4500;
+        }
+        
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .game-desc {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .play-btn {
+            background: linear-gradient(135deg, #FF6B8B, #FFA500);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 139, 0.4);
+        }
+        
+        .play-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 139, 0.6);
+        }
+        
+        .progress-section {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        .progress-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(135deg, #FF6B8B, #FFA500);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 8px;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #666;
+        }
+        
+        .easter-egg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .easter-egg.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .easter-egg-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8);
+            transition: transform 0.5s ease;
+        }
+        
+        .easter-egg.active .easter-egg-content {
+            transform: scale(1);
+        }
+        
+        .easter-egg-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .easter-egg-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .easter-egg-text {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .close-egg {
+            background: linear-gradient(135deg, #FF6B8B, #FFA500);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 139, 0.4);
+        }
+        
+        .close-egg:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 139, 0.6);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9rem;
+            width: 100%;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkin-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>单词学习游戏中心</h1>
+            <p class="subtitle">趣味学习，轻松记忆，每日进步一点点</p>
+            <div class="daily-motivation" id="dailyMotivation">
+                学习如逆水行舟，不进则退。今天也要加油哦！
+            </div>
+        </header>
+        
+        <section class="checkin-section">
+            <h2 class="checkin-title">每日打卡</h2>
+            <div class="checkin-grid" id="checkinGrid">
+                <!-- 打卡天数将通过JavaScript动态生成 -->
+            </div>
+        </section>
+        
+        <section class="games-grid" id="gamesGrid">
+            <!-- 游戏卡片将通过JavaScript动态生成 -->
+        </section>
+        
+        <section class="progress-section">
+            <h2 class="progress-title">今日学习进度</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progressBar"></div>
+            </div>
+            <p class="progress-text" id="progressText">今日已完成 0/6 个学习板块</p>
+        </section>
+        
+        <footer>
+            <p>单词学习游戏中心 &copy; 2023 | 让学习变得更有趣</p>
+        </footer>
+    </div>
+    
+    <!-- 彩蛋弹窗 -->
+    <div class="easter-egg" id="easterEgg">
+        <div class="easter-egg-content">
+            <div class="easter-egg-icon">🎉</div>
+            <h2 class="easter-egg-title">恭喜发现彩蛋！</h2>
+            <p class="easter-egg-text">你真是太棒了！今天已经学习了2个以上的板块，坚持就是胜利！继续加油，解锁更多单词学习乐趣！</p>
+            <button class="close-egg" id="closeEgg">太棒了！</button>
+        </div>
+    </div>
+
+    <script>
+        // 游戏数据
+        const gamesData = [
+            {
+                id: 1,
+                title: "单词闯关游戏",
+                description: "通过三关挑战学习单词，从基础到高级，循序渐进掌握词汇",
+                icon: "🏆",
+                color: "#FF6B8B",
+                url: "deepseek_html_20251116_3bafa8-2.html"
+            },
+            {
+                id: 2,
+                title: "单词情境学习",
+                description: "在精美故事中学习单词，通过情境记忆法加深理解",
+                icon: "📚",
+                color: "#3D9970",
+                url: "deepseek_html_20251117_10ca51 (3).html"
+            },
+            {
+                id: 3,
+                title: "女巫的魔药",
+                description: "单词匹配游戏，小心避开毒药，匹配正确的单词释义",
+                icon: "🧙‍♀️",
+                color: "#FFA500",
+                url: "deepseek_html_20251121_f82908.html"  // 更新为新的HTML文件
+            },
+            {
+                id: 4,
+                title: "单词秘境探险",
+                description: "角色扮演单词游戏，选择身份开启单词探险之旅",
+                icon: "🗺️",
+                color: "#8A2BE2",
+                url: "deepseek_html_20251117_ce9d8c.html"
+            },
+            {
+                id: 5,
+                title: "单词黄金矿工",
+                description: "经典黄金矿工玩法，抓取正确的单词矿石获得分数",
+                icon: "⛏️",
+                color: "#20B2AA",
+                url: "deepseek_html_20251121_1ea0ec.html"
+            },
+            {
+                id: 6,
+                title: "单词守卫战：保卫萝卜",
+                description: "保护萝卜不被单词怪物吃掉，选择正确的中文释义消灭怪物",
+                icon: "🥕",
+                color: "#FF4500",
+                url: "deepseek_html_20251121_70f8fe.html"
+            }
+        ];
+
+        // 激励语句
+        const motivations = [
+            "学习如逆水行舟，不进则退。今天也要加油哦！",
+            "每天进步一点点，一年后的你会感谢现在的自己！",
+            "单词是语言的基石，坚持学习，未来可期！",
+            "学习不是一蹴而就，而是日积月累的过程。",
+            "每一个单词都是一扇窗，打开它，看到更广阔的世界！",
+            "今天的努力，是明天成功的基石。",
+            "学习单词就像种树，每天浇水，终将枝繁叶茂。"
+        ];
+
+        // 应用状态
+        const appState = {
+            completedGames: [],
+            today: new Date().toDateString(),
+            checkinDays: [],
+            easterEggTriggered: false
+        };
+
+        // DOM元素
+        const gamesGrid = document.getElementById('gamesGrid');
+        const checkinGrid = document.getElementById('checkinGrid');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const dailyMotivation = document.getElementById('dailyMotivation');
+        const easterEgg = document.getElementById('easterEgg');
+        const closeEgg = document.getElementById('closeEgg');
+
+        // 初始化应用
+        function initApp() {
+            // 从本地存储加载状态
+            loadAppState();
+            
+            // 设置每日激励语
+            setDailyMotivation();
+            
+            // 初始化游戏卡片
+            initGameCards();
+            
+            // 初始化打卡系统
+            initCheckinSystem();
+            
+            // 更新进度
+            updateProgress();
+            
+            // 事件监听
+            closeEgg.addEventListener('click', () => {
+                easterEgg.classList.remove('active');
+            });
+        }
+
+        // 从本地存储加载应用状态
+        function loadAppState() {
+            const savedState = localStorage.getItem('wordLearningAppState');
+            if (savedState) {
+                const parsedState = JSON.parse(savedState);
+                
+                // 检查是否是同一天的数据
+                if (parsedState.today === appState.today) {
+                    appState.completedGames = parsedState.completedGames || [];
+                    appState.checkinDays = parsedState.checkinDays || [];
+                    appState.easterEggTriggered = parsedState.easterEggTriggered || false;
+                } else {
+                    // 新的一天，重置完成游戏状态，但保留打卡记录
+                    appState.completedGames = [];
+                    appState.checkinDays = parsedState.checkinDays || [];
+                    appState.easterEggTriggered = false;
+                }
+            }
+        }
+
+        // 保存应用状态到本地存储
+        function saveAppState() {
+            localStorage.setItem('wordLearningAppState', JSON.stringify(appState));
+        }
+
+        // 设置每日激励语
+        function setDailyMotivation() {
+            const randomIndex = Math.floor(Math.random() * motivations.length);
+            dailyMotivation.textContent = motivations[randomIndex];
+        }
+
+        // 初始化游戏卡片
+        function initGameCards() {
+            gamesGrid.innerHTML = '';
+            
+            gamesData.forEach(game => {
+                const isCompleted = appState.completedGames.includes(game.id);
+                
+                const gameCard = document.createElement('div');
+                gameCard.className = `game-card ${isCompleted ? 'completed' : ''}`;
+                gameCard.dataset.gameId = game.id;
+                
+                gameCard.innerHTML = `
+                    <div class="game-icon">${game.icon}</div>
+                    <h3 class="game-title">${game.title}</h3>
+                    <p class="game-desc">${game.description}</p>
+                    <button class="play-btn" data-url="${game.url}">开始游戏</button>
+                `;
+                
+                // 添加点击事件
+                gameCard.querySelector('.play-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    // 标记游戏为已完成（如果尚未完成）
+                    if (!appState.completedGames.includes(game.id)) {
+                        appState.completedGames.push(game.id);
+                        gameCard.classList.add('completed');
+                        updateProgress();
+                        saveAppState();
+                        
+                        // 检查是否应该触发彩蛋
+                        checkEasterEgg();
+                    }
+                    
+                    // 跳转到游戏页面
+                    const gameUrl = e.target.getAttribute('data-url');
+                    window.open(gameUrl, '_blank');
+                });
+                
+                gamesGrid.appendChild(gameCard);
+            });
+        }
+
+        // 初始化打卡系统
+        function initCheckinSystem() {
+            // 获取今天的日期
+            const today = new Date();
+            const currentDay = today.getDate();
+            
+            // 生成7天的打卡卡片
+            checkinGrid.innerHTML = '';
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(currentDay - i);
+                
+                const dayNumber = date.getDate();
+                const dayLabel = getDayLabel(date.getDay());
+                const isToday = i === 0;
+                const isChecked = appState.checkinDays.includes(date.toDateString());
+                
+                const dayCard = document.createElement('div');
+                dayCard.className = `checkin-day ${isChecked ? 'checked' : ''} ${isToday ? 'today' : ''}`;
+                dayCard.dataset.date = date.toDateString();
+                
+                dayCard.innerHTML = `
+                    <div class="day-label">${dayLabel}</div>
+                    <div class="day-number">${dayNumber}</div>
+                `;
+                
+                // 添加点击事件（只能点击今天）
+                if (isToday && !isChecked) {
+                    dayCard.style.cursor = 'pointer';
+                    dayCard.addEventListener('click', () => {
+                        // 标记为已打卡
+                        appState.checkinDays.push(date.toDateString());
+                        dayCard.classList.add('checked');
+                        saveAppState();
+                    });
+                }
+                
+                checkinGrid.appendChild(dayCard);
+            }
+        }
+
+        // 获取星期几的标签
+        function getDayLabel(dayIndex) {
+            const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            return days[dayIndex];
+        }
+
+        // 更新进度
+        function updateProgress() {
+            const completedCount = appState.completedGames.length;
+            const totalCount = gamesData.length;
+            const percentage = (completedCount / totalCount) * 100;
+            
+            progressBar.style.width = `${percentage}%`;
+            progressText.textContent = `今日已完成 ${completedCount}/${totalCount} 个学习板块`;
+        }
+
+        // 检查是否应该触发彩蛋
+        function checkEasterEgg() {
+            if (appState.completedGames.length >= 2 && !appState.easterEggTriggered) {
+                appState.easterEggTriggered = true;
+                saveAppState();
+                
+                // 显示彩蛋
+                setTimeout(() => {
+                    easterEgg.classList.add('active');
+                }, 1000);
+            }
+        }
+
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
